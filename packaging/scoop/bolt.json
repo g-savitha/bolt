@@ -1,0 +1,23 @@
+{
+    "version": "0.1.0",
+    "description": "Fast terminal P2P chat and file transfer",
+    "homepage": "https://github.com/g-savitha/flick",
+    "license": "MIT",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/g-savitha/flick/releases/download/v0.1.0/bolt_0.1.0_windows_amd64.zip",
+            "hash": "REPLACE_AFTER_FIRST_RELEASE"
+        }
+    },
+    "bin": "bolt.exe",
+    "checkver": {
+        "github": "https://github.com/g-savitha/flick"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/g-savitha/flick/releases/download/v$version/bolt_$version_windows_amd64.zip"
+            }
+        }
+    }
+}

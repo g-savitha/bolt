@@ -6,27 +6,28 @@ import (
 	"fmt"
 	"io"
 	"net"
-	"os"
 	"sync"
 )
 
-// IPC message types — the set of commands the CLI can send to the daemon.
+// IPC commands — extend this set as features grow.
 const (
-	CmdStatus    = "status"
-	CmdListPeers = "list_peers"
-	CmdDaemonID  = "id"
+	CmdStatus     = "status"
+	CmdListPeers  = "list_peers"
+	CmdDaemonID   = "id"
+	CmdConnect    = "connect"
+	CmdSendChat   = "send_chat"
+	CmdSubscribe  = "subscribe"
 )
 
-// IPCRequest is sent by the CLI to the daemon over the Unix socket.
+// IPCRequest is sent by the CLI to the daemon.
 type IPCRequest struct {
-	// ID is a client-chosen string echoed back in the response, allowing
-	// the CLI to match responses to requests if it sends multiple concurrently.
 	ID      string          `json:"id"`
+	Token   string          `json:"token"`
 	Command string          `json:"command"`
 	Payload json.RawMessage `json:"payload,omitempty"`
 }
 
-// IPCResponse is sent by the daemon back to the CLI.
+// IPCResponse is sent by the daemon for request/response commands.
 type IPCResponse struct {
 	ID      string          `json:"id"`
 	OK      bool            `json:"ok"`
@@ -34,7 +35,21 @@ type IPCResponse struct {
 	Payload json.RawMessage `json:"payload,omitempty"`
 }
 
-// StatusPayload is the response payload for the CmdStatus command.
+// IPCEvent is pushed to subscribed CLI clients (e.g. incoming chat).
+type IPCEvent struct {
+	Type    string          `json:"type"`
+	Payload json.RawMessage `json:"payload"`
+}
+
+// ChatEventPayload is the payload for a "chat" IPC event.
+type ChatEventPayload struct {
+	From        string `json:"from"`
+	Fingerprint string `json:"fingerprint"`
+	Body        string `json:"body"`
+	SentAt      string `json:"sent_at"`
+}
+
+// StatusPayload is the response payload for CmdStatus.
 type StatusPayload struct {
 	Fingerprint string            `json:"fingerprint"`
 	Nickname    string            `json:"nickname"`
@@ -42,48 +57,83 @@ type StatusPayload struct {
 	OnlinePeers []OnlinePeerEntry `json:"online_peers"`
 }
 
-// OnlinePeerEntry is one row in the StatusPayload peer list.
+// OnlinePeerEntry is one row in the peer list.
 type OnlinePeerEntry struct {
 	Fingerprint string `json:"fingerprint"`
 	Nickname    string `json:"nickname"`
 }
 
-// IPCServer listens on a Unix socket and handles requests from CLI processes.
-type IPCServer struct {
-	ln     net.Listener
-	daemon *Daemon
-	wg     sync.WaitGroup
+// ConnectPayload is the request body for CmdConnect.
+type ConnectPayload struct {
+	Address string `json:"address"`
 }
 
-// NewIPCServer creates and starts an IPC server on socketPath.
-// The caller must call Close() when done.
-func NewIPCServer(socketPath string, d *Daemon) (*IPCServer, error) {
-	// Remove a stale socket file from a previous unclean shutdown.
-	if err := os.Remove(socketPath); err != nil && !os.IsNotExist(err) {
-		return nil, fmt.Errorf("remove stale socket file: %w", err)
-	}
+// SendChatPayload is the request body for CmdSendChat.
+type SendChatPayload struct {
+	Peer string `json:"peer"`
+	Body string `json:"body"`
+}
 
-	ln, err := net.Listen("unix", socketPath)
+// IPCServer handles local CLI connections.
+type IPCServer struct {
+	ln       net.Listener
+	daemon   *Daemon
+	token    string
+	wg       sync.WaitGroup
+	subsMu   sync.Mutex
+	subs     map[net.Conn]struct{}
+}
+
+// NewIPCServer starts the platform IPC listener.
+func NewIPCServer(configDir string, d *Daemon) (*IPCServer, error) {
+	token, err := loadOrCreateIPCToken(configDir)
 	if err != nil {
-		return nil, fmt.Errorf("listen on unix socket %s: %w", socketPath, err)
+		return nil, err
 	}
 
-	s := &IPCServer{ln: ln, daemon: d}
+	ln, err := listenIPC(configDir)
+	if err != nil {
+		return nil, err
+	}
+
+	s := &IPCServer{
+		ln:     ln,
+		daemon: d,
+		token:  token,
+		subs:   make(map[net.Conn]struct{}),
+	}
 	go s.acceptLoop()
 	return s, nil
 }
 
-// Close stops the IPC server and waits for all in-flight requests to finish.
+// Close stops the IPC server.
 func (s *IPCServer) Close() {
 	s.ln.Close()
 	s.wg.Wait()
+}
+
+// PublishChat delivers a chat event to all subscribed CLI clients.
+func (s *IPCServer) PublishChat(evt ChatEventPayload) {
+	data, err := json.Marshal(evt)
+	if err != nil {
+		return
+	}
+	event := IPCEvent{Type: "chat", Payload: data}
+	s.subsMu.Lock()
+	defer s.subsMu.Unlock()
+	for conn := range s.subs {
+		if err := writeIPCFrame(conn, event); err != nil {
+			delete(s.subs, conn)
+			conn.Close()
+		}
+	}
 }
 
 func (s *IPCServer) acceptLoop() {
 	for {
 		conn, err := s.ln.Accept()
 		if err != nil {
-			return // listener closed
+			return
 		}
 		s.wg.Add(1)
 		go func() {
@@ -93,34 +143,61 @@ func (s *IPCServer) acceptLoop() {
 	}
 }
 
-// handleConn serves a single CLI connection: read one request, write one response.
 func (s *IPCServer) handleConn(conn net.Conn) {
 	defer conn.Close()
 
 	var req IPCRequest
 	if err := readIPCFrame(conn, &req); err != nil {
-		return // client disconnected before sending a full request
+		return
+	}
+	if req.Token != s.token {
+		_ = writeIPCFrame(conn, errorResponse("invalid ipc token"))
+		return
+	}
+
+	if req.Command == CmdSubscribe {
+		s.handleSubscribe(conn)
+		return
 	}
 
 	resp := s.dispatch(req)
 	resp.ID = req.ID
+	_ = writeIPCFrame(conn, resp)
+}
 
-	if err := writeIPCFrame(conn, resp); err != nil {
-		fmt.Fprintf(os.Stderr, "ipc: write response to cli: %v\n", err)
+func (s *IPCServer) handleSubscribe(conn net.Conn) {
+	s.subsMu.Lock()
+	s.subs[conn] = struct{}{}
+	s.subsMu.Unlock()
+
+	defer func() {
+		s.subsMu.Lock()
+		delete(s.subs, conn)
+		s.subsMu.Unlock()
+		conn.Close()
+	}()
+
+	// Hold connection open until the client disconnects.
+	buf := make([]byte, 1)
+	for {
+		if _, err := conn.Read(buf); err != nil {
+			return
+		}
 	}
 }
 
-// dispatch routes an IPCRequest to the appropriate handler and returns a response.
 func (s *IPCServer) dispatch(req IPCRequest) IPCResponse {
 	switch req.Command {
-	case CmdStatus:
+	case CmdStatus, CmdListPeers:
 		return s.handleStatus()
-	case CmdListPeers:
-		return s.handleListPeers()
 	case CmdDaemonID:
 		return s.handleID()
+	case CmdConnect:
+		return s.handleConnect(req.Payload)
+	case CmdSendChat:
+		return s.handleSendChat(req.Payload)
 	default:
-		return errorResponse(fmt.Sprintf("unknown command %q — update flick to use this feature", req.Command))
+		return errorResponse(fmt.Sprintf("unknown command %q — update bolt to use this feature", req.Command))
 	}
 }
 
@@ -133,7 +210,6 @@ func (s *IPCServer) handleStatus() IPCResponse {
 			Nickname:    pc.PeerNickname(),
 		}
 	}
-
 	payload := StatusPayload{
 		Fingerprint: s.daemon.id.Fingerprint(),
 		Nickname:    s.daemon.cfg.Nickname,
@@ -141,10 +217,6 @@ func (s *IPCServer) handleStatus() IPCResponse {
 		OnlinePeers: entries,
 	}
 	return okResponse(payload)
-}
-
-func (s *IPCServer) handleListPeers() IPCResponse {
-	return s.handleStatus() // status includes peer list; reuse for now
 }
 
 func (s *IPCServer) handleID() IPCResponse {
@@ -158,27 +230,52 @@ func (s *IPCServer) handleID() IPCResponse {
 	})
 }
 
-// --- IPCClient ---
-
-// IPCClient connects to a running daemon's Unix socket and sends commands.
-type IPCClient struct {
-	conn net.Conn
-}
-
-// Connect opens a connection to the daemon's Unix socket.
-// Returns an error if the daemon is not running.
-func Connect(socketPath string) (*IPCClient, error) {
-	conn, err := net.Dial("unix", socketPath)
-	if err != nil {
-		return nil, fmt.Errorf(
-			"connect to flick daemon: %w\n  Is the daemon running? Try: flick daemon",
-			err,
-		)
+func (s *IPCServer) handleConnect(raw json.RawMessage) IPCResponse {
+	var p ConnectPayload
+	if err := json.Unmarshal(raw, &p); err != nil {
+		return errorResponse("invalid connect payload")
 	}
-	return &IPCClient{conn: conn}, nil
+	if p.Address == "" {
+		return errorResponse("connect requires an address (e.g. 192.168.1.42)")
+	}
+	if err := s.daemon.ConnectPeer(s.daemon.runCtx, p.Address); err != nil {
+		return errorResponse(err.Error())
+	}
+	return okResponse(map[string]string{"address": p.Address})
 }
 
-// Send sends a command to the daemon and returns the response.
+func (s *IPCServer) handleSendChat(raw json.RawMessage) IPCResponse {
+	var p SendChatPayload
+	if err := json.Unmarshal(raw, &p); err != nil {
+		return errorResponse("invalid send_chat payload")
+	}
+	if err := s.daemon.SendChat(s.daemon.runCtx, p.Peer, p.Body); err != nil {
+		return errorResponse(err.Error())
+	}
+	return okResponse(map[string]string{"peer": p.Peer})
+}
+
+// IPCClient talks to the daemon.
+type IPCClient struct {
+	conn      net.Conn
+	configDir string
+	token     string
+}
+
+// Connect opens an authenticated connection to the daemon.
+func Connect(configDir string) (*IPCClient, error) {
+	token, err := readIPCToken(configDir)
+	if err != nil {
+		return nil, err
+	}
+	conn, err := dialIPC(configDir)
+	if err != nil {
+		return nil, err
+	}
+	return &IPCClient{conn: conn, configDir: configDir, token: token}, nil
+}
+
+// Send runs one request/response round trip.
 func (c *IPCClient) Send(command string, payload any) (*IPCResponse, error) {
 	var rawPayload json.RawMessage
 	if payload != nil {
@@ -190,11 +287,11 @@ func (c *IPCClient) Send(command string, payload any) (*IPCResponse, error) {
 	}
 
 	req := IPCRequest{
-		ID:      "1", // single request per connection — ID is trivial
+		ID:      "1",
+		Token:   c.token,
 		Command: command,
 		Payload: rawPayload,
 	}
-
 	if err := writeIPCFrame(c.conn, req); err != nil {
 		return nil, fmt.Errorf("send ipc request: %w", err)
 	}
@@ -206,21 +303,48 @@ func (c *IPCClient) Send(command string, payload any) (*IPCResponse, error) {
 	return &resp, nil
 }
 
-// Close closes the connection to the daemon.
+// Close closes the connection.
 func (c *IPCClient) Close() error {
 	return c.conn.Close()
 }
 
-// --- framing helpers ---
-// IPC frames use the same length-prefix format as wire.go:
-// [4-byte big-endian uint32 length][JSON bytes]
+// Subscribe opens a long-lived connection that receives IPC events.
+func Subscribe(configDir string) (conn net.Conn, token string, err error) {
+	token, err = readIPCToken(configDir)
+	if err != nil {
+		return nil, "", err
+	}
+	conn, err = dialIPC(configDir)
+	if err != nil {
+		return nil, "", err
+	}
+
+	req := IPCRequest{
+		ID:      "sub",
+		Token:   token,
+		Command: CmdSubscribe,
+	}
+	if err := writeIPCFrame(conn, req); err != nil {
+		conn.Close()
+		return nil, "", err
+	}
+	return conn, token, nil
+}
+
+// ReadEvent reads the next event frame from a subscribe connection.
+func ReadEvent(conn net.Conn) (*IPCEvent, error) {
+	var evt IPCEvent
+	if err := readIPCFrame(conn, &evt); err != nil {
+		return nil, err
+	}
+	return &evt, nil
+}
 
 func writeIPCFrame(w io.Writer, v any) error {
 	data, err := json.Marshal(v)
 	if err != nil {
 		return fmt.Errorf("marshal ipc message: %w", err)
 	}
-
 	var buf [4]byte
 	binary.BigEndian.PutUint32(buf[:], uint32(len(data)))
 	if _, err := w.Write(buf[:]); err != nil {
@@ -238,18 +362,15 @@ func readIPCFrame(r io.Reader, dst any) error {
 		return err
 	}
 	length := binary.BigEndian.Uint32(buf[:])
-	if length > 1<<20 { // 1 MB cap on IPC messages
+	if length > 1<<20 {
 		return fmt.Errorf("ipc frame too large: %d bytes", length)
 	}
-
 	data := make([]byte, length)
 	if _, err := io.ReadFull(r, data); err != nil {
 		return err
 	}
 	return json.Unmarshal(data, dst)
 }
-
-// --- response helpers ---
 
 func okResponse(payload any) IPCResponse {
 	data, _ := json.Marshal(payload)

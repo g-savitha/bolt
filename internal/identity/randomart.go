@@ -9,7 +9,7 @@ import (
 // Randomart generates an SSH-style "drunken bishop" visual fingerprint from
 // a public key. The output looks like this:
 //
-//	+--[ flick ]----+
+//	+--[ bolt ]----+
 //	|     .o.       |
 //	|    o  o       |
 //	|   . +  .      |
@@ -79,7 +79,7 @@ func Randomart(pub ed25519.PublicKey) string {
 	symbols := " .o+=*BOX@%&#/^SE"
 
 	var sb strings.Builder
-	sb.WriteString("+--[ flick ]----+\n")
+	sb.WriteString("+--[ bolt ]----+\n")
 
 	for row := 0; row < height; row++ {
 		sb.WriteByte('|')
@@ -101,7 +101,7 @@ func Randomart(pub ed25519.PublicKey) string {
 // randomart together, ready to print to the terminal. Example output:
 //
 //	Fingerprint: ab:cd:ef:12:34:...
-//	+--[ flick ]----+
+//	+--[ bolt ]----+
 //	|     .o.       |
 //	...
 func FormatIdentityBlock(pub ed25519.PublicKey) string {

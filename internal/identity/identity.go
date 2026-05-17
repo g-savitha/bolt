@@ -227,7 +227,7 @@ func readPrivateKey(path string) (ed25519.PrivateKey, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return nil, fmt.Errorf("private key not found at %s — run 'flick init' first", path)
+			return nil, fmt.Errorf("private key not found at %s — run 'bolt init' first", path)
 		}
 		return nil, fmt.Errorf("read private key file: %w", err)
 	}
@@ -250,7 +250,7 @@ func readPublicKey(path string) (ed25519.PublicKey, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return nil, fmt.Errorf("public key not found at %s — run 'flick init' first", path)
+			return nil, fmt.Errorf("public key not found at %s — run 'bolt init' first", path)
 		}
 		return nil, fmt.Errorf("read public key file: %w", err)
 	}

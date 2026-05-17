@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flick/flick/internal/proto"
+	"github.com/bolt/bolt/internal/proto"
 )
 
 func TestWriteAndReadFrame_RoundTrip(t *testing.T) {

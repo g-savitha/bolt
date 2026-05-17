@@ -1,6 +1,6 @@
-# flick
+# bolt
 
-Fast, encrypted, terminal-native file transfer and chat between machines you control.
+Fast, encrypted, terminal-native P2P chat and file transfer between machines you control.
 
 No accounts. No central servers. No internet required for LAN use. Your Ed25519 keypair is your identity.
 
@@ -24,38 +24,30 @@ No accounts. No central servers. No internet required for LAN use. Your Ed25519 
 
 ## Install
 
-> Phase 1 is implemented. Install from source for now.
+See **[INSTALL.md](INSTALL.md)** for Homebrew, Scoop, and release binaries.
 
 ```bash
-git clone https://github.com/flick/flick
-cd flick
-go build -o flick ./cmd/flick
-sudo mv flick /usr/local/bin/
+# macOS / Linux
+curl -fsSL https://raw.githubusercontent.com/g-savitha/flick/main/scripts/install.sh | bash
+
+# or from source
+git clone https://github.com/g-savitha/flick.git
+cd flick && go build -o bolt ./cmd/bolt
 ```
 
-Requires Go 1.21+. Produces a single static binary with no runtime dependencies.
+**Supported platforms:** macOS, Linux, Windows (amd64). Single static binary, no runtime deps.
 
-**Supported platforms:** Linux, macOS. Windows is not supported in v1 (Unix socket IPC).
+**Open source client (this repo).** Paid internet relay (`boltd` on your VPS) is separate — no relay secrets here.
 
 ---
 
 ## Quick start
 
 ```bash
-# On each machine — generate your identity and start the daemon
-flick init
-
-# See who's online on your network
-flick peers
-
-# Send a file
-flick send report.pdf alice-macbook
-
-# Chat
-flick chat alice-macbook
-
-# Check daemon status
-flick status
+bolt init
+bolt connect 192.168.1.42   # peer IP on same WiFi
+bolt chat <peer-nickname>
+bolt status
 ```
 
 ---

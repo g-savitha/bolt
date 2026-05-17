@@ -14,13 +14,13 @@ import (
 	"crypto/x509"
 	"fmt"
 
-	"github.com/flick/flick/internal/identity"
+	"github.com/bolt/bolt/internal/identity"
 )
 
 // flickALPN is the Application-Layer Protocol Negotiation token for flick.
 // quic-go requires at least one ALPN token. Using our own makes it clear
 // this is a flick connection and not another QUIC-based protocol.
-const flickALPN = "flick/1"
+const boltALPN = "bolt/1"
 
 // ServerTLSConfig returns a TLS configuration for the QUIC listener.
 // It presents our self-signed certificate to connecting peers.
@@ -37,7 +37,7 @@ func ServerTLSConfig(id *identity.Identity) (*tls.Config, error) {
 		// Require clients to present a certificate so we can inspect their
 		// identity. We do not verify against a CA — we verify via fingerprint.
 		ClientAuth: tls.RequireAnyClientCert,
-		NextProtos: []string{flickALPN},
+		NextProtos: []string{boltALPN},
 		MinVersion: tls.VersionTLS13,
 	}, nil
 }
@@ -61,7 +61,7 @@ func ClientTLSConfig(id *identity.Identity, onUnknownPeer PeerVerifier) (*tls.Co
 		VerifyPeerCertificate: func(rawCerts [][]byte, _ [][]*x509.Certificate) error {
 			return verifyPeerCertificate(rawCerts, onUnknownPeer)
 		},
-		NextProtos: []string{flickALPN},
+		NextProtos: []string{boltALPN},
 		MinVersion: tls.VersionTLS13,
 	}, nil
 }

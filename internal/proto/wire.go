@@ -58,9 +58,9 @@ type HandshakeMsg struct {
 	// The receiver must verify it matches the SubjectKeyId of the TLS cert.
 	PublicKeyHex string `json:"public_key"`
 	Nickname     string `json:"nickname"`
-	// FlickVersion is the flick binary version string (e.g. "0.1.0").
+	// BoltVersion is the flick binary version string (e.g. "0.1.0").
 	// Used for informational display, not protocol gating (use V for that).
-	FlickVersion string `json:"flick_version"`
+	BoltVersion string `json:"bolt_version"`
 }
 
 // --- Chat ---

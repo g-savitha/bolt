@@ -101,7 +101,7 @@ func LoadPeerStore(dir string) (*PeerStore, error) {
 
 	if pf.Version > peersVersion {
 		return nil, fmt.Errorf(
-			"peers file version %d is newer than this flick binary (version %d) — please update flick",
+			"peers file version %d is newer than this flick binary (version %d) — please update bolt",
 			pf.Version, peersVersion,
 		)
 	}
@@ -181,7 +181,7 @@ func (s *PeerStore) SetTrust(fingerprint string, trust TrustLevel) error {
 
 	peer, ok := s.peers[fingerprint]
 	if !ok {
-		return fmt.Errorf("unknown peer %s — add this peer first with 'flick connect'", fingerprint)
+		return fmt.Errorf("unknown peer %s — add this peer first with 'bolt connect'", fingerprint)
 	}
 
 	peer.Trust = trust

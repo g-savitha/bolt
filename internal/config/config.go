@@ -143,7 +143,7 @@ func migrate(cfg *Config) (changed bool, err error) {
 	}
 	if cfg.Version > configVersion {
 		return false, fmt.Errorf(
-			"config file version %d is newer than this flick binary (version %d) — please update flick",
+			"config file version %d is newer than this flick binary (version %d) — please update bolt",
 			cfg.Version, configVersion,
 		)
 	}

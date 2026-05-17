@@ -1,0 +1,22 @@
+# Binaries
+/bolt
+/bolt.exe
+/dist/
+
+# Archives
+*.tar.gz
+*.zip
+
+# Secrets — never commit relay or deploy credentials
+.env
+*.pem
+**/relay_secret*
+**/flickd.toml
+**/boltd.toml
+deploy/*.local.*
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
+*.swp

@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/flick/flick/internal/identity"
+	"github.com/bolt/bolt/internal/identity"
 )
 
 func TestGenerateAndLoad(t *testing.T) {

@@ -4,16 +4,17 @@ import (
 	"context"
 	"encoding/hex"
 	"fmt"
+	"strings"
 	"sync"
 
-	"github.com/flick/flick/internal/identity"
-	"github.com/flick/flick/internal/proto"
+	"github.com/bolt/bolt/internal/identity"
+	"github.com/bolt/bolt/internal/proto"
 	"github.com/quic-go/quic-go"
 )
 
-// FlickVersion is the current application version, sent during handshake.
+// BoltVersion is the current application version, sent during handshake.
 // Peers use this for display only — not for protocol compatibility gating.
-const FlickVersion = "0.1.0"
+const BoltVersion = "0.1.0"
 
 // PeerConn represents an authenticated, live QUIC connection to a remote peer.
 //
@@ -35,17 +36,11 @@ type PeerConn struct {
 	chatStream   *quic.Stream
 }
 
-// Handshake performs the flick application-level identity verification after
+// Handshake performs the bolt application-level identity verification after
 // the TLS handshake has already completed inside QUIC.
 //
-// The TLS layer encrypts the connection and provides the peer's certificate.
-// This handshake verifies that the Ed25519 key embedded in that certificate
-// actually matches the public key the peer claims to have, preventing a
-// subtle substitution attack where a MITM presents a valid TLS cert but
-// with a different underlying identity.
-//
 // After Handshake returns without error, PeerConn is ready to use.
-func (pc *PeerConn) Handshake(ctx context.Context, localID *identity.Identity) error {
+func (pc *PeerConn) Handshake(ctx context.Context, local LocalPeer) error {
 	// Both sides open a handshake stream simultaneously. We open ours and
 	// accept theirs concurrently to avoid deadlock.
 	type handshakeResult struct {
@@ -82,8 +77,7 @@ func (pc *PeerConn) Handshake(ctx context.Context, localID *identity.Identity) e
 		receivedCh <- handshakeResult{msg: msg}
 	}()
 
-	// Send our handshake to the peer.
-	if err := pc.sendHandshake(ctx, localID); err != nil {
+	if err := pc.sendHandshake(ctx, local); err != nil {
 		return err
 	}
 
@@ -96,8 +90,7 @@ func (pc *PeerConn) Handshake(ctx context.Context, localID *identity.Identity) e
 	return pc.validateHandshake(result.msg)
 }
 
-// sendHandshake opens a StreamHandshake stream and sends our identity to the peer.
-func (pc *PeerConn) sendHandshake(ctx context.Context, localID *identity.Identity) error {
+func (pc *PeerConn) sendHandshake(ctx context.Context, local LocalPeer) error {
 	stream, err := pc.conn.OpenStreamSync(ctx)
 	if err != nil {
 		return fmt.Errorf("open handshake stream: %w", err)
@@ -110,8 +103,9 @@ func (pc *PeerConn) sendHandshake(ctx context.Context, localID *identity.Identit
 
 	msg := proto.HandshakeMsg{
 		V:            proto.WireVersion,
-		PublicKeyHex: hex.EncodeToString(localID.PublicKey),
-		FlickVersion: FlickVersion,
+		PublicKeyHex: hex.EncodeToString(local.Identity.PublicKey),
+		Nickname:     local.Nickname,
+		BoltVersion:  BoltVersion,
 	}
 	return proto.WriteFrame(stream, msg)
 }
@@ -121,7 +115,7 @@ func (pc *PeerConn) sendHandshake(ctx context.Context, localID *identity.Identit
 func (pc *PeerConn) validateHandshake(msg proto.HandshakeMsg) error {
 	if msg.V != proto.WireVersion {
 		return fmt.Errorf(
-			"peer speaks protocol version %d, we speak version %d — update flick to connect",
+			"peer speaks protocol version %d, we speak version %d — update bolt to connect",
 			msg.V, proto.WireVersion,
 		)
 	}
@@ -233,6 +227,41 @@ func (r *PeerRegistry) Get(fingerprint string) *PeerConn {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	return r.conns[fingerprint]
+}
+
+// GetByNickname returns a connected peer with an exact nickname match, or nil.
+func (r *PeerRegistry) GetByNickname(nickname string) *PeerConn {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	for _, pc := range r.conns {
+		if pc.PeerNickname() == nickname {
+			return pc
+		}
+	}
+	return nil
+}
+
+// ResolvePeer finds a connected peer by nickname or fingerprint prefix.
+func (r *PeerRegistry) ResolvePeer(name string) (*PeerConn, error) {
+	if pc := r.GetByNickname(name); pc != nil {
+		return pc, nil
+	}
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	var matches []*PeerConn
+	for fp, pc := range r.conns {
+		if strings.HasPrefix(fp, name) || strings.HasPrefix(pc.PeerNickname(), name) {
+			matches = append(matches, pc)
+		}
+	}
+	switch len(matches) {
+	case 0:
+		return nil, fmt.Errorf("peer %q is not connected — run 'bolt connect <ip>' first", name)
+	case 1:
+		return matches[0], nil
+	default:
+		return nil, fmt.Errorf("peer name %q is ambiguous (%d matches)", name, len(matches))
+	}
 }
 
 // Online returns a snapshot of all currently connected peers.
