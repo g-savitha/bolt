@@ -1,4 +1,4 @@
-# Release: git tag v0.1.0 && git push --tags
+# Release: git tag v0.1.1 && git push --tags
 # Local snapshot: goreleaser build --snapshot --clean
 version: 2
 
@@ -57,33 +57,36 @@ release:
   draft: false
   prerelease: false
 
-brews:
-  - name: bolt
-    ids:
-      - bolt
-    repository:
-      owner: g-savitha
-      name: homebrew-tap
-      token: "{{ .Env.GITHUB_TOKEN }}"
-    directory: Formula
-    homepage: "https://github.com/g-savitha/bolt"
-    description: "Fast terminal P2P chat and file transfer"
-    license: MIT
-    install: |
-      bin.install "bolt"
-    test: |
-      system "#{bin}/bolt", "version"
-    skip_upload: auto
-
-scoops:
-  - name: bolt
-    ids:
-      - bolt
-    repository:
-      owner: g-savitha
-      name: scoop-bolt
-      token: "{{ .Env.GITHUB_TOKEN }}"
-    homepage: "https://github.com/g-savitha/bolt"
-    description: "Fast terminal P2P chat and file transfer"
-    license: MIT
-    skip_upload: auto
+# Homebrew and Scoop publishers are wired in manually via:
+#   packaging/homebrew/Formula/bolt.rb  (update sha256 from SHA256SUMS after each release)
+#   packaging/scoop/bolt.json           (update hash from SHA256SUMS after each release)
+#
+# To enable auto-publish via GoReleaser:
+#   1. Create repos: g-savitha/homebrew-tap  and  g-savitha/scoop-bolt
+#   2. Uncomment the blocks below
+#   3. Add HOMEBREW_TAP_GITHUB_TOKEN secret (needs repo write on the tap)
+#
+# brews:
+#   - name: bolt
+#     repository:
+#       owner: g-savitha
+#       name: homebrew-tap
+#       token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+#     directory: Formula
+#     homepage: "https://github.com/g-savitha/bolt"
+#     description: "Fast terminal P2P chat and file transfer"
+#     license: MIT
+#     install: |
+#       bin.install "bolt"
+#     test: |
+#       system "#{bin}/bolt", "version"
+#
+# scoops:
+#   - name: bolt
+#     repository:
+#       owner: g-savitha
+#       name: scoop-bolt
+#       token: "{{ .Env.SCOOP_BUCKET_GITHUB_TOKEN }}"
+#     homepage: "https://github.com/g-savitha/bolt"
+#     description: "Fast terminal P2P chat and file transfer"
+#     license: MIT
