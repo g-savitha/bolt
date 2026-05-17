@@ -24,20 +24,60 @@ No accounts. No central servers. No internet required for LAN use. Your Ed25519 
 
 ## Install
 
-See **[INSTALL.md](INSTALL.md)** for Homebrew, Scoop, and release binaries.
+Single static binary — no runtime dependencies, no sudo required on Windows.
+
+**Supported platforms:** macOS (Intel + Apple Silicon), Linux (amd64 + arm64), Windows (amd64)
+
+### macOS / Linux — one-liner (always installs latest)
 
 ```bash
-# macOS / Linux
 curl -fsSL https://raw.githubusercontent.com/g-savitha/bolt/main/scripts/install.sh | bash
-
-# or from source
-git clone https://github.com/g-savitha/bolt.git
-cd bolt && go build -o bolt ./cmd/bolt
 ```
 
-**Supported platforms:** macOS, Linux, Windows (amd64). Single static binary, no runtime deps.
+Installs to `/usr/local/bin/bolt`. Verify:
 
-**Open source client (this repo).** Paid internet relay (`boltd` on your VPS) is separate — no relay secrets here.
+```bash
+bolt version
+```
+
+### Windows — PowerShell one-liner
+
+```powershell
+irm https://raw.githubusercontent.com/g-savitha/bolt/main/scripts/install.ps1 | iex
+```
+
+Installs to `%LOCALAPPDATA%\Programs\bolt` and adds it to `PATH` automatically.  
+Open a **new terminal**, then verify:
+
+```powershell
+bolt version
+```
+
+### Manual download
+
+Grab the right archive from the [latest release](https://github.com/g-savitha/bolt/releases/latest), extract, and put the binary on your `PATH`:
+
+| Platform | File |
+|---|---|
+| macOS Apple Silicon | `bolt_<version>_darwin_arm64.tar.gz` |
+| macOS Intel | `bolt_<version>_darwin_amd64.tar.gz` |
+| Linux x86-64 | `bolt_<version>_linux_amd64.tar.gz` |
+| Linux ARM64 | `bolt_<version>_linux_arm64.tar.gz` |
+| Windows | `bolt_<version>_windows_amd64.zip` |
+
+Checksums for every archive are in `SHA256SUMS` attached to each release.
+
+### Build from source
+
+```bash
+git clone https://github.com/g-savitha/bolt.git
+cd bolt
+go build -o bolt ./cmd/bolt
+```
+
+Requires Go 1.22+.
+
+**Open source client (this repo).** Internet relay (`boltd`) is a separate binary for your own VPS — no relay code or secrets in this repo.
 
 ---
 
