@@ -2,7 +2,7 @@
 
 ## Install
 
-Pick one method. Full details: [INSTALL.md](INSTALL.md).
+Pick one method. Full details: [README.md](README.md#install).
 
 **macOS / Linux**
 
@@ -80,4 +80,4 @@ Type at `>`; `/quit` to exit. Nickname is from `bolt status` (usually hostname).
 | LAN chat (`bolt connect` + `bolt chat`) | Free                                                             |
 | Internet relay (Hyd → Amsterdam, etc.)  | Paid hosted service — `relay_token` in config (not in this repo) |
 
-See [INSTALL.md](INSTALL.md) for packaging. Relay server (`boltd`) stays private / separate repo.
+See [README.md](README.md#install) for full install options. Relay server (`boltd`) stays private / separate repo.
