@@ -1,11 +1,11 @@
-# flick — Architecture Diagram
+# bolt — Architecture Diagram
 
 ## System Overview
 
 ```mermaid
 graph TB
     subgraph "Your Machine (Hyderabad)"
-        CLI["flick CLI\ncmd/flick/main.go"]
+        CLI["bolt CLI\ncmd/bolt/main.go"]
         SOCK["Unix Socket\ndaemon.sock"]
         DAEMON["Daemon\ninternal/daemon/daemon.go"]
         ID["Identity\nEd25519 Keypair"]
@@ -28,14 +28,14 @@ graph TB
     end
 
     subgraph "Discovery"
-        MDNS["mDNS\n_flick._udp\nLAN only"]
-        RELAY["Relay Server\nflickd\nInternet peers"]
+        MDNS["mDNS\n_bolt._udp\nLAN only"]
+        RELAY["Relay Server\nboltd\nInternet peers"]
         ICE["ICE Hole-punch\npion/ice"]
         TURN["TURN Fallback\ncoturn"]
     end
 
     subgraph "Friend's Machine (Amsterdam)"
-        DAEMON2["flick Daemon"]
+        DAEMON2["bolt Daemon"]
         ID2["Ed25519 Identity"]
     end
 
@@ -70,7 +70,7 @@ graph TB
 
 ```mermaid
 flowchart TD
-    START([flick send file friend]) --> CHECK{Same LAN?}
+    START([bolt send file friend]) --> CHECK{Same LAN?}
 
     CHECK -->|Yes| MDNS_PATH[mDNS Discovery\nauto-found in ~3 seconds]
     CHECK -->|No| RELAY_PATH[Register with\nRelay Server]
@@ -169,7 +169,7 @@ sequenceDiagram
 
 ```mermaid
 graph LR
-    subgraph config ["~/.config/flick/"]
+    subgraph config ["~/.config/bolt/"]
         PK["identity/private.key\n0600 permissions\nEd25519 private key"]
         PUB["identity/public.key\n0644 permissions\nEd25519 public key"]
         CONF["config.toml\nversion=1\nnickname, port, receive_dir, relay"]
@@ -178,7 +178,7 @@ graph LR
         DPID["daemon.pid\nflock-protected"]
     end
 
-    subgraph share ["~/.local/share/flick/"]
+    subgraph share ["~/.local/share/bolt/"]
         CHAT["logs/peer-YYYY-MM-DD.log\nopt-in chat history"]
         XFER["logs/transfers-YYYY-MM-DD.log\nopt-in transfer history"]
         INC["incomplete/uuid.json\nresume state"]
@@ -192,15 +192,15 @@ graph LR
 
 ```mermaid
 flowchart TD
-    CMD([Any flick command]) --> CHECK[Try connect to\ndaemon.sock]
+    CMD([Any bolt command]) --> CHECK[Try connect to\ndaemon.sock]
     CHECK -->|Connected| READY2([Daemon already running\nSend IPC request])
     CHECK -->|Refused| LOCK[Acquire flock on\ndaemon.pid]
     LOCK --> RECHECK[Re-check socket\ninside lock]
     RECHECK -->|Now connected| UNLOCK[Release lock]
     UNLOCK --> READY2
-    RECHECK -->|Still not running| SPAWN[Re-exec binary as\nflick daemon\nSetsid=true detached]
+    RECHECK -->|Still not running| SPAWN[Re-exec binary as\nbolt daemon\nSetsid=true detached]
     SPAWN --> WRITE[Write child PID\nto daemon.pid]
     WRITE --> POLL[Poll daemon.sock\nevery 50ms]
     POLL -->|Connected within 3s| UNLOCK
-    POLL -->|Timeout| ERROR([Error: daemon did not start\nRun flick daemon manually])
+    POLL -->|Timeout| ERROR([Error: daemon did not start\nRun bolt daemon manually])
 ```

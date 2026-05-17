@@ -8,7 +8,7 @@ Internet relay (e.g. Hyd → Amsterdam) uses a **paid hosted service** — relay
 ### macOS / Linux
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/g-savitha/flick/main/scripts/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/g-savitha/bolt/main/scripts/install.sh | bash
 ```
 
 Or a specific version:
@@ -20,7 +20,7 @@ Or a specific version:
 ### Windows (PowerShell)
 
 ```powershell
-irm https://raw.githubusercontent.com/g-savitha/flick/main/scripts/install.ps1 | iex
+irm https://raw.githubusercontent.com/g-savitha/bolt/main/scripts/install.ps1 | iex
 ```
 
 Allow `bolt.exe` through the firewall for **private networks** and UDP **7799**.
@@ -32,7 +32,7 @@ Allow `bolt.exe` through the firewall for **private networks** and UDP **7799**.
 **Option A — install script** (works before the formula SHA256 is updated):
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/g-savitha/flick/main/scripts/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/g-savitha/bolt/main/scripts/install.sh | bash
 ```
 
 **Option B — tap** (after you create `g-savitha/homebrew-tap` and GoReleaser publishes the formula):
@@ -45,7 +45,7 @@ brew install bolt
 **Option C — formula from this repo** (update `sha256` in [packaging/homebrew/Formula/bolt.rb](packaging/homebrew/Formula/bolt.rb) from the release `SHA256SUMS` first):
 
 ```bash
-brew install --formula https://raw.githubusercontent.com/g-savitha/flick/main/packaging/homebrew/Formula/bolt.rb
+brew install --formula https://raw.githubusercontent.com/g-savitha/bolt/main/packaging/homebrew/Formula/bolt.rb
 ```
 
 ---
@@ -71,15 +71,15 @@ scoop install path/to/packaging/scoop/bolt.json
 
 ## GitHub Releases (manual)
 
-Download the archive for your OS/arch from [Releases](https://github.com/g-savitha/flick/releases), verify `SHA256SUMS`, and put `bolt` on your `PATH`.
+Download the archive for your OS/arch from [Releases](https://github.com/g-savitha/bolt/releases), verify `SHA256SUMS`, and put `bolt` on your `PATH`.
 
 ---
 
 ## Build from source
 
 ```bash
-git clone https://github.com/g-savitha/flick.git
-cd flick
+git clone https://github.com/g-savitha/bolt.git
+cd bolt
 go build -o bolt ./cmd/bolt
 sudo mv bolt /usr/local/bin/
 ```

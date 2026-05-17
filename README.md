@@ -28,11 +28,11 @@ See **[INSTALL.md](INSTALL.md)** for Homebrew, Scoop, and release binaries.
 
 ```bash
 # macOS / Linux
-curl -fsSL https://raw.githubusercontent.com/g-savitha/flick/main/scripts/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/g-savitha/bolt/main/scripts/install.sh | bash
 
 # or from source
-git clone https://github.com/g-savitha/flick.git
-cd flick && go build -o bolt ./cmd/bolt
+git clone https://github.com/g-savitha/bolt.git
+cd bolt && go build -o bolt ./cmd/bolt
 ```
 
 **Supported platforms:** macOS, Linux, Windows (amd64). Single static binary, no runtime deps.
@@ -55,25 +55,25 @@ bolt status
 ## Commands
 
 ```
-flick init                           Generate identity, start daemon
-flick id                             Show your fingerprint and randomart
-flick peers                          List online peers (LAN + relay)
-flick connect <ip>                   Manually add a peer by IP (VPN / internet)
-flick trust <peer> always|once|block Set per-peer trust level
-flick send <file> <peer> [peer2...]  Send a file to one or more peers
-flick send - <peer>                  Send from stdin (pipe support)
-flick chat <peer>                    Open 1:1 chat TUI
-flick chat --all                     Group chat with all trusted online peers
-flick daemon [--stealth]             Run daemon in foreground; --stealth = fully dark
-flick status                         Show daemon stats, peers, active transfers
-flick receive-dir <path>             Set receive directory for this session
+bolt init                           Generate identity, start daemon
+bolt id                             Show your fingerprint and randomart
+bolt peers                          List online peers (LAN + relay)
+bolt connect <ip>                   Manually add a peer by IP (VPN / internet)
+bolt trust <peer> always|once|block Set per-peer trust level
+bolt send <file> <peer> [peer2...]  Send a file to one or more peers
+bolt send - <peer>                  Send from stdin (pipe support)
+bolt chat <peer>                    Open 1:1 chat TUI
+bolt chat --all                     Group chat with all trusted online peers
+bolt daemon [--stealth]             Run daemon in foreground; --stealth = fully dark
+bolt status                         Show daemon stats, peers, active transfers
+bolt receive-dir <path>             Set receive directory for this session
 ```
 
 ---
 
 ## How identity works
 
-When you run `flick init`, an Ed25519 keypair is generated and stored at `~/.config/flick/identity/`. This keypair is permanent — your **fingerprint** is the SHA-256 hash of your public key, formatted as colon-separated hex:
+When you run `bolt init`, an Ed25519 keypair is generated and stored at `~/.config/bolt/identity/`. This keypair is permanent — your **fingerprint** is the SHA-256 hash of your public key, formatted as colon-separated hex:
 
 ```
 4b:4e:c9:4b:15:f4:38:30:4e:1c:73:75:f2:ee:0f:20:...
@@ -82,7 +82,7 @@ When you run `flick init`, an Ed25519 keypair is generated and stored at `~/.con
 It also renders as a visual randomart (same algorithm as SSH `VisualHostKey`) so peers can verify your identity with a glance rather than comparing 64 hex characters.
 
 ```
-+--[ flick ]----+
++--[ bolt ]----+
 |    .o       oo|
 |   .o.      . o|
 |   ..o...    .o|
@@ -97,9 +97,9 @@ It also renders as a visual randomart (same algorithm as SSH `VisualHostKey`) so
 
 ### TOFU — Trust On First Use
 
-The first time two machines connect, flick shows you the peer's fingerprint and randomart and asks you to confirm. **Verify the fingerprint out-of-band** — a phone call, Signal message, or in person. Once confirmed, the peer is saved to `~/.config/flick/peers.toml` and future connections are automatic.
+The first time two machines connect, bolt shows you the peer's fingerprint and randomart and asks you to confirm. **Verify the fingerprint out-of-band** — a phone call, Signal message, or in person. Once confirmed, the peer is saved to `~/.config/bolt/peers.toml` and future connections are automatic.
 
-This is the same trust model SSH uses with `known_hosts`. If a fingerprint changes unexpectedly, flick warns you loudly.
+This is the same trust model SSH uses with `known_hosts`. If a fingerprint changes unexpectedly, bolt warns you loudly.
 
 ---
 
@@ -107,16 +107,16 @@ This is the same trust model SSH uses with `known_hosts`. If a fingerprint chang
 
 Each peer has a trust level you control:
 
-| Level | Behaviour |
-|---|---|
-| `always-allow` | Files accepted automatically — no prompt |
-| `allow-once` | Prompted for each incoming file (default for new peers) |
-| `block` | All connections silently rejected |
+| Level          | Behaviour                                               |
+| -------------- | ------------------------------------------------------- |
+| `always-allow` | Files accepted automatically — no prompt                |
+| `allow-once`   | Prompted for each incoming file (default for new peers) |
+| `block`        | All connections silently rejected                       |
 
 ```bash
-flick trust alice-macbook always   # fire-and-forget
-flick trust work-server once       # prompt each time (default)
-flick trust stranger block         # never connect
+bolt trust alice-macbook always   # fire-and-forget
+bolt trust work-server once       # prompt each time (default)
+bolt trust stranger block         # never connect
 ```
 
 ---
@@ -131,20 +131,20 @@ Chunk size is path-aware: large on LAN (4MB), smaller over relay (256KB).
 
 ```bash
 # Send a file
-flick send video.mp4 alice-macbook
+bolt send video.mp4 alice-macbook
 
 # Send to multiple peers simultaneously
-flick send report.pdf alice-macbook pi-homelab
+bolt send report.pdf alice-macbook pi-homelab
 
 # Pipe from stdin
-tar czf - ./project | flick send - alice-macbook
-cat /var/log/syslog | flick send - monitoring-server
+tar czf - ./project | bolt send - alice-macbook
+cat /var/log/syslog | bolt send - monitoring-server
 ```
 
 Received files land in `~/Downloads` by default. Change it:
 
 ```toml
-# ~/.config/flick/config.toml
+# ~/.config/bolt/config.toml
 receive_dir = "/mnt/storage/incoming"
 ```
 
@@ -154,27 +154,27 @@ receive_dir = "/mnt/storage/incoming"
 
 ```bash
 # 1:1 chat — opens a TUI
-flick chat alice-macbook
+bolt chat alice-macbook
 
 # Group chat with everyone online
-flick chat --all
+bolt chat --all
 ```
 
 Chat is **ephemeral by default** — nothing is written to disk. To opt in to local logging:
 
 ```bash
-flick chat alice-macbook --log
+bolt chat alice-macbook --log
 ```
 
 Or set it permanently in config:
 
 ```toml
-# ~/.config/flick/config.toml
+# ~/.config/bolt/config.toml
 log_chat = true
 log_transfers = true
 ```
 
-Logs are written to `~/.local/share/flick/logs/`.
+Logs are written to `~/.local/share/bolt/logs/`.
 
 ---
 
@@ -187,16 +187,16 @@ Peers discover each other automatically via mDNS. No configuration needed. Works
 For VPNs that block multicast, add peers manually:
 
 ```bash
-flick connect 10.8.0.5       # WireGuard VPN peer
-flick connect 100.64.0.3     # Tailscale peer
+bolt connect 10.8.0.5       # WireGuard VPN peer
+bolt connect 100.64.0.3     # Tailscale peer
 ```
 
 ### Different networks (internet)
 
-Requires a relay server (`flickd`) that you run on a VPS. The relay handles peer discovery and NAT hole-punching. File content is E2E encrypted before leaving your machine — the relay never sees plaintext.
+Requires a relay server (`boltd`) that you run on a VPS. The relay handles peer discovery and NAT hole-punching. File content is E2E encrypted before leaving your machine — the relay never sees plaintext.
 
 ```toml
-# ~/.config/flick/config.toml
+# ~/.config/bolt/config.toml
 relay = "https://relay.yourdomain.com"
 relay_cert_fingerprint = "ab:cd:ef:..."   # only needed for self-signed certs
 ```
@@ -207,36 +207,36 @@ See [Relay setup](#relay-setup) below.
 
 ## Stealth mode
 
-Running with `--stealth` makes your machine invisible to both mDNS and the relay. It will not appear in anyone's `flick peers` list. You can still receive connections from peers who know your IP directly.
+Running with `--stealth` makes your machine invisible to both mDNS and the relay. It will not appear in anyone's `bolt peers` list. You can still receive connections from peers who know your IP directly.
 
 ```bash
-flick daemon --stealth
+bolt daemon --stealth
 
 # Connect to a stealth machine directly
-flick connect 192.168.1.42
+bolt connect 192.168.1.42
 ```
 
 ---
 
 ## Relay setup
 
-The relay (`flickd`) is a small Go binary you run on any VPS. It handles peer discovery and NAT hole-punching. It does **not** see file content or chat messages.
+The relay (`boltd`) is a small Go binary you run on any VPS. It handles peer discovery and NAT hole-punching. It does **not** see file content or chat messages.
 
 ```bash
 # Build the relay binary
-go build -o flickd ./cmd/flickd
+go build -o boltd ./cmd/boltd
 
 # Deploy to your VPS
-scp flickd user@your-vps:~/
+scp boltd user@your-vps:~/
 ```
 
 Configure it:
 
 ```toml
-# flickd.toml
+# boltd.toml
 relay_secret = "your-long-random-secret-here"
 port = 443
-cert_dir = "/etc/flickd/certs"   # for Let's Encrypt
+cert_dir = "/etc/boltd/certs"   # for Let's Encrypt
 ```
 
 Install `coturn` for TURN fallback (handles ~25% of connections that fail NAT hole-punching):
@@ -249,15 +249,15 @@ apt install coturn
 Start as a service:
 
 ```bash
-cp deploy/flickd.service /etc/systemd/system/
-systemctl enable --now flickd
+cp deploy/boltd.service /etc/systemd/system/
+systemctl enable --now boltd
 ```
 
 ---
 
 ## Privacy
 
-**What flick never does:**
+**What bolt never does:**
 - No telemetry, no analytics, no call-home
 - No auto-update that could be tampered with
 - No anonymous connections — every peer has a verified identity
@@ -280,7 +280,7 @@ If you run your own relay on a VPS you control, you control all of this metadata
 ## Configuration reference
 
 ```toml
-# ~/.config/flick/config.toml
+# ~/.config/bolt/config.toml
 version = 1
 
 nickname = "alice-macbook"        # shown to peers
@@ -300,7 +300,7 @@ max_relay_transfer_bytes = 5368709120   # 5GB cap for TURN-relayed transfers
 ## File layout
 
 ```
-~/.config/flick/
+~/.config/bolt/
   identity/private.key    Ed25519 private key (0600 — never shared)
   identity/public.key     Ed25519 public key
   config.toml             User preferences
@@ -308,7 +308,7 @@ max_relay_transfer_bytes = 5368709120   # 5GB cap for TURN-relayed transfers
   daemon.sock             Unix socket (runtime, auto-created)
   daemon.pid              Daemon PID (runtime, auto-created)
 
-~/.local/share/flick/
+~/.local/share/bolt/
   logs/                   Opt-in chat and transfer logs
   incomplete/             In-progress transfer state (for resume)
 ```
@@ -317,14 +317,14 @@ max_relay_transfer_bytes = 5368709120   # 5GB cap for TURN-relayed transfers
 
 ## Build phases
 
-| Phase | Status | What it adds |
-|---|---|---|
+| Phase              | Status   | What it adds                                         |
+| ------------------ | -------- | ---------------------------------------------------- |
 | 1 — Core transport | **Done** | Identity, QUIC, TOFU handshake, daemon, CLI skeleton |
-| 2 — File transfer | Planned | Chunked parallel transfer, progress bar, resume |
-| 3 — Peer discovery | Planned | mDNS auto-discovery, manual connect, daemon IPC |
-| 4 — Chat TUI | Planned | Real-time chat, bubbletea TUI, opt-in logging |
-| 5 — Internet path | Planned | Relay server, ICE hole-punch, TURN fallback |
-| 6 — Polish | Planned | Cross-compile releases, error message audit |
+| 2 — File transfer  | Planned  | Chunked parallel transfer, progress bar, resume      |
+| 3 — Peer discovery | Planned  | mDNS auto-discovery, manual connect, daemon IPC      |
+| 4 — Chat TUI       | Planned  | Real-time chat, bubbletea TUI, opt-in logging        |
+| 5 — Internet path  | Planned  | Relay server, ICE hole-punch, TURN fallback          |
+| 6 — Polish         | Planned  | Cross-compile releases, error message audit          |
 
 ---
 
@@ -341,17 +341,17 @@ See [architecture.md](architecture.md) for Mermaid diagrams covering:
 
 ## Tech stack
 
-| Concern | Library |
-|---|---|
-| Transport | `quic-go` — QUIC over UDP, TLS 1.3 built-in |
-| Hole-punching | `pion/ice` — ICE candidate negotiation |
-| LAN discovery | `grandcat/zeroconf` — mDNS _flick._udp |
-| Cryptography | `golang.org/x/crypto` — Ed25519, ChaCha20-Poly1305 |
-| TUI | `charmbracelet/bubbletea` + `bubbles` + `lipgloss` |
-| CLI | `spf13/cobra` |
-| Config | `BurntSushi/toml` |
-| Relay storage | `modernc.org/sqlite` — pure Go, no CGO |
-| TURN server | `coturn` — deployed separately on VPS |
+| Concern       | Library                                            |
+| ------------- | -------------------------------------------------- |
+| Transport     | `quic-go` — QUIC over UDP, TLS 1.3 built-in        |
+| Hole-punching | `pion/ice` — ICE candidate negotiation             |
+| LAN discovery | `grandcat/zeroconf` — mDNS _bolt._udp              |
+| Cryptography  | `golang.org/x/crypto` — Ed25519, ChaCha20-Poly1305 |
+| TUI           | `charmbracelet/bubbletea` + `bubbles` + `lipgloss` |
+| CLI           | `spf13/cobra`                                      |
+| Config        | `BurntSushi/toml`                                  |
+| Relay storage | `modernc.org/sqlite` — pure Go, no CGO             |
+| TURN server   | `coturn` — deployed separately on VPS              |
 
 ---
 

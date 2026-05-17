@@ -1,4 +1,4 @@
-// Package proto defines the on-wire protocol between flick nodes.
+// Package proto defines the on-wire protocol between bolt nodes.
 //
 // Every QUIC stream begins with a single StreamType byte that tells the
 // receiver how to interpret the rest of the stream. After that byte, all
@@ -53,12 +53,12 @@ const (
 // Both peers send and receive a HandshakeMsg simultaneously on a StreamHandshake
 // stream before any other protocol activity begins.
 type HandshakeMsg struct {
-	V            int    `json:"v"`
+	V int `json:"v"`
 	// PublicKeyHex is the sender's Ed25519 public key as a hex string.
 	// The receiver must verify it matches the SubjectKeyId of the TLS cert.
 	PublicKeyHex string `json:"public_key"`
 	Nickname     string `json:"nickname"`
-	// BoltVersion is the flick binary version string (e.g. "0.1.0").
+	// BoltVersion is the bolt binary version string (e.g. "0.1.0").
 	// Used for informational display, not protocol gating (use V for that).
 	BoltVersion string `json:"bolt_version"`
 }
@@ -68,11 +68,11 @@ type HandshakeMsg struct {
 // ChatMsg carries a single chat message from one peer to another.
 // Sent over a persistent StreamChat stream.
 type ChatMsg struct {
-	V       int       `json:"v"`
-	ID      string    `json:"id"`       // UUID, used for deduplication in group chat
-	From    string    `json:"from"`     // sender's nickname
-	Body    string    `json:"body"`     // message text
-	SentAt  time.Time `json:"sent_at"`
+	V      int       `json:"v"`
+	ID     string    `json:"id"`   // UUID, used for deduplication in group chat
+	From   string    `json:"from"` // sender's nickname
+	Body   string    `json:"body"` // message text
+	SentAt time.Time `json:"sent_at"`
 	// GroupID is non-empty for group chat messages. Empty means 1:1.
 	GroupID string `json:"group_id,omitempty"`
 }
@@ -88,10 +88,10 @@ type FileHeader struct {
 	SizeBytes   int64  `json:"size_bytes"`  // -1 if unknown (stdin pipe)
 	TotalChunks int    `json:"total_chunks"`
 	// ChunkSize is negotiated per-transfer: large on LAN, small over TURN relay.
-	ChunkSize   int    `json:"chunk_size"`
+	ChunkSize int `json:"chunk_size"`
 	// FileHash is the SHA-256 of the complete file, hex-encoded.
 	// Receiver verifies this after all chunks arrive.
-	FileHash    string `json:"file_hash"`
+	FileHash string `json:"file_hash"`
 }
 
 // TransferAck is the receiver's response to a FileHeader.
@@ -99,14 +99,14 @@ type FileHeader struct {
 // ResumeFromChunks is non-nil when the receiver has a partial download and
 // wants only the listed chunk indices retransmitted.
 type TransferAck struct {
-	V                int    `json:"v"`
-	TransferID       string `json:"transfer_id"`
-	Accepted         bool   `json:"accepted"`
+	V          int    `json:"v"`
+	TransferID string `json:"transfer_id"`
+	Accepted   bool   `json:"accepted"`
 	// Reason is set when Accepted=false. Always a human-readable string.
-	Reason           string `json:"reason,omitempty"`
+	Reason string `json:"reason,omitempty"`
 	// ResumeFromChunks lists chunk indices the receiver still needs.
 	// Nil means "send everything" (new transfer, no partial data).
-	ResumeFromChunks []int  `json:"resume_from_chunks,omitempty"`
+	ResumeFromChunks []int `json:"resume_from_chunks,omitempty"`
 }
 
 // ChunkMsg carries one chunk of file data on a parallel StreamFile stream.
@@ -117,8 +117,8 @@ type ChunkMsg struct {
 	TransferID string `json:"transfer_id"`
 	Index      int    `json:"index"`
 	// ChunkHash is SHA-256 of Data, hex-encoded. Receiver verifies before writing.
-	ChunkHash  string `json:"chunk_hash"`
-	Data       []byte `json:"data"`
+	ChunkHash string `json:"chunk_hash"`
+	Data      []byte `json:"data"`
 }
 
 // TransferDone signals that the sender has dispatched all chunks.
@@ -133,7 +133,7 @@ type TransferDone struct {
 // HeartbeatMsg is sent periodically on a StreamControl stream to confirm
 // the connection is still alive.
 type HeartbeatMsg struct {
-	V  int `json:"v"`
+	V int `json:"v"`
 	// SeqNo increments with each heartbeat. The other side echoes it back
 	// so we can measure round-trip latency.
 	SeqNo int `json:"seq_no"`
@@ -150,7 +150,7 @@ type CancelMsg struct {
 
 // WriteFrame writes a length-prefixed JSON message to w.
 // The format is: [4-byte big-endian uint32 length][JSON bytes].
-// All flick messages are sent with this framing.
+// All bolt messages are sent with this framing.
 func WriteFrame(w io.Writer, msg any) error {
 	data, err := json.Marshal(msg)
 	if err != nil {

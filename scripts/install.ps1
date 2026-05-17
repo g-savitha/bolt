@@ -1,6 +1,6 @@
 # Install bolt from GitHub Releases (Windows).
 # Usage:
-#   irm https://raw.githubusercontent.com/g-savitha/flick/main/scripts/install.ps1 | iex
+#   irm https://raw.githubusercontent.com/g-savitha/bolt/main/scripts/install.ps1 | iex
 #   .\scripts\install.ps1 [-Version 0.1.0]
 param(
     [string]$Version = "0.1.0",
@@ -9,7 +9,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 $Owner = "g-savitha"
-$Repo = "flick"
+$Repo = "bolt"
 $Asset = "bolt_${Version}_windows_amd64.zip"
 $Url = "https://github.com/$Owner/$Repo/releases/download/v$Version/$Asset"
 

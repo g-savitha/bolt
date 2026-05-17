@@ -27,6 +27,10 @@ type Handler func(IncomingMessage)
 
 // Service manages chat streams and message delivery for connected peers.
 type Service struct {
+	// connCtx is the connection-lifetime context (daemon run context).
+	// Reader goroutines opened by ensureChatStream use this so they are
+	// cancelled when the daemon shuts down, not when an individual Send call ends.
+	connCtx  context.Context
 	mu       sync.RWMutex
 	handlers []Handler
 	streams  map[string]*peerChat // fingerprint → chat session
@@ -38,8 +42,12 @@ type peerChat struct {
 }
 
 // NewService creates an empty chat service.
-func NewService() *Service {
+// connCtx is the daemon's run context: reader goroutines are tied to its
+// lifetime so they stop when the daemon shuts down, regardless of which
+// per-request context triggered stream creation.
+func NewService(connCtx context.Context) *Service {
 	return &Service{
+		connCtx: connCtx,
 		streams: make(map[string]*peerChat),
 	}
 }
@@ -146,7 +154,9 @@ func (s *Service) ensureChatStream(ctx context.Context, pc *transport.PeerConn) 
 	s.streams[fp] = session
 	s.mu.Unlock()
 
-	go s.AttachStream(context.Background(), pc, stream)
+	// Use the connection-lifetime context, not the per-request ctx, so the
+	// reader goroutine lives as long as the daemon — not just this Send call.
+	go s.AttachStream(s.connCtx, pc, stream)
 	return session, nil
 }
 

@@ -1,4 +1,4 @@
-# flick — Full Conversation Log
+# bolt — Full Conversation Log
 **Date:** 2026-05-17
 
 ---
@@ -43,16 +43,16 @@ You're describing something closer to Signal + BitTorrent + IRC fused together, 
 
 **What Already Exists (and why it's not quite this)**
 
-| Tool | Gap |
-|---|---|
-| Tox | P2P chat + file share, but dead/stagnant, no terminal-first UX |
-| Briar | P2P, but mobile-only, no file transfer speed focus |
-| Bitmessage | P2P messaging, but slow by design, no files |
-| ZeroMQ/libp2p apps | Infrastructure, not end-user |
-| IRC | Terminal-native but centralized, no E2E, no files |
-| Session | Onion-routed P2P chat, but no terminal client, no fast file sharing |
-| Retroshare | Closest match — P2P friends + chat + files, but GUI-only, dated |
-| croc | Lightning-fast terminal file transfer but no social layer at all |
+| Tool               | Gap                                                                 |
+| ------------------ | ------------------------------------------------------------------- |
+| Tox                | P2P chat + file share, but dead/stagnant, no terminal-first UX      |
+| Briar              | P2P, but mobile-only, no file transfer speed focus                  |
+| Bitmessage         | P2P messaging, but slow by design, no files                         |
+| ZeroMQ/libp2p apps | Infrastructure, not end-user                                        |
+| IRC                | Terminal-native but centralized, no E2E, no files                   |
+| Session            | Onion-routed P2P chat, but no terminal client, no fast file sharing |
+| Retroshare         | Closest match — P2P friends + chat + files, but GUI-only, dated     |
+| croc               | Lightning-fast terminal file transfer but no social layer at all    |
 
 **What's Actually Unique Here**
 
@@ -116,12 +116,12 @@ Why? Because your friends need to use it too. That's the core trap. This is call
 
 **What's Actually Worth Building Here**
 
-| Narrow Problem | Why It's Defensible |
-|---|---|
-| Fast, authenticated, terminal file transfer between known machines you control | croc exists but has weak auth; you could beat it on resumability + speed |
-| E2E encrypted local network (LAN) chat — no internet required | Genuinely underserved; useful in enterprises, conferences, offline scenarios |
-| Scriptable, pipeable team messaging CLI that wraps an existing protocol (Matrix, XMPP) | Adds value without reinventing the security layer |
-| Encrypted dead-drop — leave a message for someone to pick up later | Novel framing, simpler P2P problem, avoids NAT issues |
+| Narrow Problem                                                                         | Why It's Defensible                                                          |
+| -------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| Fast, authenticated, terminal file transfer between known machines you control         | croc exists but has weak auth; you could beat it on resumability + speed     |
+| E2E encrypted local network (LAN) chat — no internet required                          | Genuinely underserved; useful in enterprises, conferences, offline scenarios |
+| Scriptable, pipeable team messaging CLI that wraps an existing protocol (Matrix, XMPP) | Adds value without reinventing the security layer                            |
+| Encrypted dead-drop — leave a message for someone to pick up later                     | Novel framing, simpler P2P problem, avoids NAT issues                        |
 
 **Language Recommendation**
 
@@ -145,11 +145,11 @@ Python — Do not use for this.
 
 **Verdict**
 
-| If you want to... | Use |
-|---|---|
-| Ship something working in weeks | Go |
-| Maximum performance, you know Rust | Rust |
-| Prototype and explore ideas | Python (throw it away later) |
+| If you want to...                  | Use                          |
+| ---------------------------------- | ---------------------------- |
+| Ship something working in weeks    | Go                           |
+| Maximum performance, you know Rust | Rust                         |
+| Prototype and explore ideas        | Python (throw it away later) |
 
 **My Honest Overall Assessment**
 
@@ -184,14 +184,14 @@ So you're not bolting two unrelated things together. You're building one secure 
 
 ### Who Actually Needs This?
 
-| Scenario | Real Pain Today |
-|---|---|
-| Home lab / self-hosters | SSH + netcat for files, nothing for chat between machines |
-| Air-gapped environments (security researchers, gov, military) | No good terminal-native option exists |
-| Conference / event networks | Internet is unreliable; people need to share files between laptops in the same room |
-| Remote dev teams on a VPN | VPN = effectively a LAN; Slack requires internet |
-| Raspberry Pi clusters, homelab nodes | No GUI, need something scriptable |
-| Offline journalism / field reporting | Need to move files securely between laptops without internet exposure |
+| Scenario                                                      | Real Pain Today                                                                     |
+| ------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| Home lab / self-hosters                                       | SSH + netcat for files, nothing for chat between machines                           |
+| Air-gapped environments (security researchers, gov, military) | No good terminal-native option exists                                               |
+| Conference / event networks                                   | Internet is unreliable; people need to share files between laptops in the same room |
+| Remote dev teams on a VPN                                     | VPN = effectively a LAN; Slack requires internet                                    |
+| Raspberry Pi clusters, homelab nodes                          | No GUI, need something scriptable                                                   |
+| Offline journalism / field reporting                          | Need to move files securely between laptops without internet exposure               |
 
 ### Honest Critique of This Narrower Idea
 
@@ -247,7 +247,7 @@ Go. No question. Reasons specific to this project:
 
 ### The Name
 
-flick — fast, directional, intentional. "Flick a file over." Verb-as-command. Easy to type. Not taken as a major open source project.
+bolt — fast, directional, intentional. "bolt a file over." Verb-as-command. Easy to type. Not taken as a major open source project.
 
 ### Three Questions to Sharpen This Further
 
@@ -295,13 +295,13 @@ Same WiFi: Straightforward — same mDNS discovery, direct QUIC. Works.
 
 Different Networks (Cellular): Cannot avoid a relay server or internet connectivity.
 
-| Approach | Tradeoff |
-|---|---|
-| Your own relay server | You control it, you pay for it |
-| Tor hidden services | No relay needed, but slow, complex |
-| WebRTC TURN server | Standard approach, requires internet, costs money at scale |
-| Tailscale/WireGuard overlay | Requires VPN setup — too much friction |
-| Content-addressed relay (like magic-wormhole) | Short-lived relay, minimal data stored |
+| Approach                                      | Tradeoff                                                   |
+| --------------------------------------------- | ---------------------------------------------------------- |
+| Your own relay server                         | You control it, you pay for it                             |
+| Tor hidden services                           | No relay needed, but slow, complex                         |
+| WebRTC TURN server                            | Standard approach, requires internet, costs money at scale |
+| Tailscale/WireGuard overlay                   | Requires VPN setup — too much friction                     |
+| Content-addressed relay (like magic-wormhole) | Short-lived relay, minimal data stored                     |
 
 There is no free lunch here. Mobile-to-mobile across networks requires infrastructure unless you use Tor.
 
@@ -348,15 +348,15 @@ A single binary, terminal-native tool that runs on any machine on your LAN (or V
 
 ### The Real Competitive Gap
 
-| Tool | Chat | Files | LAN-only | Terminal | Auth | Single binary |
-|---|---|---|---|---|---|---|
-| croc | No | Yes | No | Yes | Yes (PAKE) | Yes |
-| magic-wormhole | No | Yes | No | Yes | Yes | No (Python) |
-| LocalSend | No | Yes | Yes | No | Weak | No |
-| Mosh | No | No | No | Yes | Yes | No |
-| Netcat | Kinda | Kinda | Yes | Yes | No | Yes |
-| SSH/SCP | No | Yes | Yes | Yes | Yes | Yes |
-| Your tool | Yes | Yes | Yes | Yes | Yes | Yes |
+| Tool           | Chat  | Files | LAN-only | Terminal | Auth       | Single binary |
+| -------------- | ----- | ----- | -------- | -------- | ---------- | ------------- |
+| croc           | No    | Yes   | No       | Yes      | Yes (PAKE) | Yes           |
+| magic-wormhole | No    | Yes   | No       | Yes      | Yes        | No (Python)   |
+| LocalSend      | No    | Yes   | Yes      | No       | Weak       | No            |
+| Mosh           | No    | No    | No       | Yes      | Yes        | No            |
+| Netcat         | Kinda | Kinda | Yes      | Yes      | No         | Yes           |
+| SSH/SCP        | No    | Yes   | Yes      | Yes      | Yes        | Yes           |
+| Your tool      | Yes   | Yes   | Yes      | Yes      | Yes        | Yes           |
 
 No existing tool fills all six columns. That's your defensible position.
 
@@ -375,17 +375,17 @@ No existing tool fills all six columns. That's your defensible position.
 ### CLI Design
 
 ```bash
-flick init
-flick peers
-flick chat savvy-macbook
-flick chat --all
-flick send report.pdf savvy-macbook
-flick send video.mp4 savvy-macbook pi-homelab
-flick daemon
-flick trust savvy-iphone
-flick id
-cat logs.txt | flick send - savvy-macbook
-tar czf - ./project | flick send - pi-homelab
+bolt init
+bolt peers
+bolt chat savvy-macbook
+bolt chat --all
+bolt send report.pdf savvy-macbook
+bolt send video.mp4 savvy-macbook pi-homelab
+bolt daemon
+bolt trust savvy-iphone
+bolt id
+cat logs.txt | bolt send - savvy-macbook
+tar czf - ./project | bolt send - pi-homelab
 ```
 
 ### What to Build First (Phased)
@@ -411,7 +411,7 @@ github.com/BurntSushi/toml
 
 ### One Concern to Keep in Mind
 
-mDNS exposes your machine's hostname and presence to everyone on that LAN. Solution: `flick daemon --stealth` that doesn't broadcast mDNS but still accepts direct connections.
+mDNS exposes your machine's hostname and presence to everyone on that LAN. Solution: `bolt daemon --stealth` that doesn't broadcast mDNS but still accepts direct connections.
 
 ---
 
@@ -443,20 +443,20 @@ Without VPN support (mDNS only):
 
 With VPN support (mDNS + fallback):
 - Try mDNS first → if nothing found → try manual IP
-- Maintain a local peers file (~/.config/flick/peers.toml)
+- Maintain a local peers file (~/.config/bolt/peers.toml)
 
 The change is not huge — add manual connect + peers config file. mDNS becomes one strategy among several. Recommendation: build mDNS + manual IP from day one.
 
 ### Locking In All Decisions
 
 Storage:
-| Data | Persistence | Location |
-|---|---|---|
-| Your keypair | Always | ~/.config/flick/identity |
-| Known peers + fingerprints | Always | ~/.config/flick/peers.toml |
-| Chat messages | Ephemeral default | In memory only |
-| Chat messages (opt-in) | --log flag | ~/.local/share/flick/logs/ |
-| Trust preferences | Always | ~/.config/flick/trust.toml |
+| Data                       | Persistence       | Location                  |
+| -------------------------- | ----------------- | ------------------------- |
+| Your keypair               | Always            | ~/.config/bolt/identity   |
+| Known peers + fingerprints | Always            | ~/.config/bolt/peers.toml |
+| Chat messages              | Ephemeral default | In memory only            |
+| Chat messages (opt-in)     | --log flag        | ~/.local/share/bolt/logs/ |
+| Trust preferences          | Always            | ~/.config/bolt/trust.toml |
 
 Trust model:
 - always-allow → fire and forget
@@ -464,7 +464,7 @@ Trust model:
 - block → reject silently
 - Default for unknown peers: allow-once (never auto-allow strangers)
 
-Daemon: Auto-daemon chosen — first flick command spawns background daemon if none running, like ssh-agent. Communicates via Unix socket.
+Daemon: Auto-daemon chosen — first bolt command spawns background daemon if none running, like ssh-agent. Communicates via Unix socket.
 
 ---
 
@@ -477,24 +477,24 @@ remember privacy is important and i dont want people to use this for malafide in
 
 Saved to memory. Let me address this properly as it directly affects the architecture.
 
-### Privacy + Abuse Prevention: What This Means for flick
+### Privacy + Abuse Prevention: What This Means for bolt
 
 **Privacy-First in Practice:**
 
-| Risk | What We Do |
-|---|---|
-| IP address leakage | mDNS only broadcasts on local network — your IP never leaves your LAN |
-| Metadata collection | Zero telemetry, zero analytics, no call-home, ever |
+| Risk                  | What We Do                                                                    |
+| --------------------- | ----------------------------------------------------------------------------- |
+| IP address leakage    | mDNS only broadcasts on local network — your IP never leaves your LAN         |
+| Metadata collection   | Zero telemetry, zero analytics, no call-home, ever                            |
 | Chat history exposure | Ephemeral by default — nothing written to disk unless user explicitly opts in |
-| Identity linkage | Your keypair is local — no username, no email, no account |
-| File content exposure | All transfers encrypted with TLS 1.3 inside QUIC |
-| Update mechanism | Users download updates manually — no auto-update |
+| Identity linkage      | Your keypair is local — no username, no email, no account                     |
+| File content exposure | All transfers encrypted with TLS 1.3 inside QUIC                              |
+| Update mechanism      | Users download updates manually — no auto-update                              |
 
-**Structural Limits That Make flick Hard to Abuse:**
+**Structural Limits That Make bolt Hard to Abuse:**
 
 1. TOFU trust model — you cannot send files to or chat with a machine unless it has explicitly accepted your fingerprint. No cold-contact possible.
 
-2. No relay server — flick cannot reach machines outside your LAN. No infrastructure to abuse at scale.
+2. No relay server — bolt cannot reach machines outside your LAN. No infrastructure to abuse at scale.
 
 3. Opt-in receive — default trust for unknown peers is allow-once (prompt). A machine cannot receive files silently unless the owner set always-allow.
 
@@ -511,7 +511,7 @@ Saved to memory. Let me address this properly as it directly affects the archite
 
 **One Honest Remaining Risk:**
 
-flick could be misused between two people who both have it installed and mutually trusted each other. But that's true of scp, rsync, a USB drive, or email. You can't prevent misuse by people with legitimate physical access without making the tool useless. The design limits the blast radius to your trusted circle.
+bolt could be misused between two people who both have it installed and mutually trusted each other. But that's true of scp, rsync, a USB drive, or email. You can't prevent misuse by people with legitimate physical access without making the tool useless. The design limits the blast radius to your trusted circle.
 
 ---
 
@@ -524,15 +524,15 @@ lets say i'm at hyd and i want to send files to my friend in amsterdam, how is t
 
 It doesn't. And that's the honest answer.
 
-The current architecture is explicitly LAN-scoped. If you and your friend are in different cities, different countries, different networks — flick as designed cannot help you.
+The current architecture is explicitly LAN-scoped. If you and your friend are in different cities, different countries, different networks — bolt as designed cannot help you.
 
 ### What Your Options Are
 
 **Option 1: Stay LAN-only (current plan)**
-Accept the limitation. flick is for machines you control on the same network. For Hyderabad → Amsterdam: your friend is simply not the use case.
+Accept the limitation. bolt is for machines you control on the same network. For Hyderabad → Amsterdam: your friend is simply not the use case.
 
 **Option 2: Add VPN-as-LAN support (no new architecture)**
-You and your friend both join the same VPN. Tailscale, WireGuard, or ZeroTier creates a virtual LAN. flick works exactly as designed. Tailscale is free for personal use.
+You and your friend both join the same VPN. Tailscale, WireGuard, or ZeroTier creates a virtual LAN. bolt works exactly as designed. Tailscale is free for personal use.
 
 Tradeoff: Tailscale is a third-party service for the coordination step. After that, traffic is direct peer-to-peer.
 
@@ -551,9 +551,9 @@ STUN/TURN model. Relay only helps with discovery and NAT traversal. Actual file 
 
 ### My Recommendation
 
-Don't change the architecture for v1. Tailscale solves this cleanly today. Building a relay is significant scope increase. The unique value of flick is the combination of chat + files + authenticated identity + terminal UX on a trusted network.
+Don't change the architecture for v1. Tailscale solves this cleanly today. Building a relay is significant scope increase. The unique value of bolt is the combination of chat + files + authenticated identity + terminal UX on a trusted network.
 
-Ship flick as a LAN/VPN tool. Document "use Tailscale for internet." That's a complete, honest product.
+Ship bolt as a LAN/VPN tool. Document "use Tailscale for internet." That's a complete, honest product.
 
 ---
 
@@ -568,7 +568,7 @@ Fair point. This changes the architecture meaningfully.
 
 ### What You're Actually Asking For
 
-You want: `flick send file friend-name` and it works, wherever they are. No VPN setup friction.
+You want: `bolt send file friend-name` and it works, wherever they are. No VPN setup friction.
 
 That is a fundamentally different problem from LAN transfer. Three things break across the internet:
 
@@ -613,7 +613,7 @@ Build Option D (hybrid) with Option A (your own relay) for v1.
 - The relay is small — peer registry + TURN is maybe 200 lines of Go
 
 What this adds to the plan:
-- A second small Go binary: flickd — the relay server
+- A second small Go binary: boltd — the relay server
 - Peer registration protocol
 - NAT hole-punch coordination
 - TURN fallback for ~30-40% of cases where hole-punch fails
@@ -647,28 +647,28 @@ it feels ok. save the entire conversation we have had so far in a md file for fu
 
 Here's the breakdown:
 
-**The relay is the only scalability concern.** The flick binary itself is peer-to-peer — it doesn't scale because there's nothing to scale. Each machine talks directly to other machines. That part is inherently distributed.
+**The relay is the only scalability concern.** The bolt binary itself is peer-to-peer — it doesn't scale because there's nothing to scale. Each machine talks directly to other machines. That part is inherently distributed.
 
-The relay (`flickd`) is the bottleneck. What it handles:
+The relay (`boltd`) is the bottleneck. What it handles:
 - Peer registry (who's online)
 - NAT hole-punch coordination (lightweight, just message passing)
 - TURN fallback (bandwidth-intensive when active — actual file bytes flow through it)
 
 **What a single $6/month VPS can handle:**
 
-| Load | Feasibility |
-|---|---|
-| 10-50 concurrent users | Trivially fine |
-| 100-500 concurrent users | Fine if TURN fallback rate is low (most peers hole-punch successfully) |
-| 1,000+ concurrent users | TURN relay bandwidth becomes expensive. Peer registry needs proper storage (not in-memory). |
-| 10,000+ concurrent users | Single VPS cannot handle TURN traffic. Need distributed relay nodes. |
+| Load                     | Feasibility                                                                                 |
+| ------------------------ | ------------------------------------------------------------------------------------------- |
+| 10-50 concurrent users   | Trivially fine                                                                              |
+| 100-500 concurrent users | Fine if TURN fallback rate is low (most peers hole-punch successfully)                      |
+| 1,000+ concurrent users  | TURN relay bandwidth becomes expensive. Peer registry needs proper storage (not in-memory). |
+| 10,000+ concurrent users | Single VPS cannot handle TURN traffic. Need distributed relay nodes.                        |
 
 **The honest trajectory:**
 - v1 with 1 VPS handles you and your friends comfortably — no concern
 - If it gets to hundreds of users, you upgrade the VPS — still manageable
 - If it gets to thousands, you redesign the relay to be federated (anyone can run a relay node, users connect to the nearest one) — that's Option B from the architecture discussion
 
-**Design for scalability now in one specific way:** Don't hardcode a single relay IP into the binary. Use a configurable relay endpoint in `~/.config/flick/config.toml`. That way, if you ever need to run multiple relay nodes or let users run their own, the client already supports it — zero code change.
+**Design for scalability now in one specific way:** Don't hardcode a single relay IP into the binary. Use a configurable relay endpoint in `~/.config/bolt/config.toml`. That way, if you ever need to run multiple relay nodes or let users run their own, the client already supports it — zero code change.
 
 Everything else: build for correctness first, scale later when the problem is real.
 
@@ -685,7 +685,7 @@ The journey from "P2P social network" to "authenticated terminal file transfer +
 Most privacy tools overclaim. This one doesn't — the relay sees IPs and presence, and that's stated upfront. That's intellectually honest and makes the security properties trustworthy rather than marketing.
 
 **3. Terminal-first is a real differentiator.**
-Developers, sysadmins, and power users are underserved by GUI file transfer tools. The Unix philosophy — pipeable, composable, scriptable — is a genuine advantage. `tar czf - ./project | flick send - peername` is genuinely useful and nothing else does it this cleanly.
+Developers, sysadmins, and power users are underserved by GUI file transfer tools. The Unix philosophy — pipeable, composable, scriptable — is a genuine advantage. `tar czf - ./project | bolt send - peername` is genuinely useful and nothing else does it this cleanly.
 
 **4. QUIC is the right transport choice.**
 HTTP/3 chose QUIC for good reasons. Multiplexed streams without head-of-line blocking, connection migration, built-in TLS 1.3. Most tools don't use it yet. You'd be ahead of the curve.
@@ -707,10 +707,10 @@ You pushed back when the scope crept (mobile), you asked hard questions (geograp
 If your VPS goes down, internet-based peer discovery fails for everyone using your instance. You now have an ops responsibility. Patches, uptime monitoring, billing, backups. Most developers underestimate how much time server maintenance takes. This is not free.
 
 **2. The network effect problem didn't go away — it got smaller.**
-Your friend in Amsterdam needs to install flick, run `flick init`, exchange fingerprints with you, and have an online daemon. That's more friction than "here's a WeTransfer link." For most people, the convenience gap will lose to existing tools every time. You're building for a specific kind of person — one who prefers the terminal and cares about privacy. That audience is real but small.
+Your friend in Amsterdam needs to install bolt, run `bolt init`, exchange fingerprints with you, and have an online daemon. That's more friction than "here's a WeTransfer link." For most people, the convenience gap will lose to existing tools every time. You're building for a specific kind of person — one who prefers the terminal and cares about privacy. That audience is real but small.
 
 **3. NAT traversal will bite you.**
-30-40% of connections will fail hole-punching and need TURN relay. Some enterprise networks, CGNAT (very common in India on mobile data), and symmetric NATs will block even TURN. You will get bug reports saying "flick doesn't work from my office" that are genuinely hard to fix. This is a known hard problem that large well-funded teams (WebRTC, Tailscale) have spent years on.
+30-40% of connections will fail hole-punching and need TURN relay. Some enterprise networks, CGNAT (very common in India on mobile data), and symmetric NATs will block even TURN. You will get bug reports saying "bolt doesn't work from my office" that are genuinely hard to fix. This is a known hard problem that large well-funded teams (WebRTC, Tailscale) have spent years on.
 
 **4. Key management UX is still unsolved.**
 TOFU is clean conceptually. In practice: what happens when your friend reinstalls their OS and gets a new keypair? Their fingerprint changes. You get a scary "FINGERPRINT CHANGED — possible attack" warning (same as SSH). Most non-technical users will either panic or click through without understanding. There's no good answer — it's an inherent tension between security and usability.
@@ -753,7 +753,7 @@ After the initial design was locked in, several rounds of critic review surfaced
 
 **Daemon PID race condition fixed** — `EnsureDaemon()` acquires an exclusive `flock` on `daemon.pid` before spawning. Two simultaneous CLI invocations can no longer race and spawn two daemons.
 
-**Multi-peer send failure behaviour defined** — `flick send file peer1 peer2 peer3` skips offline peers, reports per-peer success/fail, exit code non-zero only if all failed.
+**Multi-peer send failure behaviour defined** — `bolt send file peer1 peer2 peer3` skips offline peers, reports per-peer success/fail, exit code non-zero only if all failed.
 
 **Receive directory defined** — Configurable `receive_dir` in `config.toml`, defaults to `~/Downloads`. No overwrite — appends `_1`, `_2` suffix on filename collision.
 
@@ -763,7 +763,7 @@ After the initial design was locked in, several rounds of critic review surfaced
 
 **Test strategy defined** — Unit tests required for: identity, chunking, wire framing, config migration. Integration tests for: TOFU handshake, full transfer with corruption injection, resume after kill. No mocks for crypto or network.
 
-**`flick chat --all` trust guard** — Fan-out only to peers with established `PeerConn`. Skipped peers printed to stderr.
+**`bolt chat --all` trust guard** — Fan-out only to peers with established `PeerConn`. Skipped peers printed to stderr.
 
 **Randomart** — Confirmed that `golang.org/x/crypto/ssh` does not export its randomart implementation. Solution: copy the ~80-line drunken bishop algorithm (MIT licensed) directly into `internal/identity/randomart.go`.
 
@@ -797,7 +797,7 @@ Stream type constants (`StreamHandshake`, `StreamChat`, `StreamFile`, `StreamCon
 4 tests: round-trip encode/decode, oversize frame rejection, stream type round-trip for all 4 types, sequential multi-message framing.
 
 **`internal/transport/tls.go`**
-`ServerTLSConfig` (requires client cert, no CA verification). `ClientTLSConfig` with `VerifyPeerCertificate` callback that extracts Ed25519 pubkey from cert and delegates to a `PeerVerifier` function for TOFU. `flickALPN = "flick/1"` as the QUIC ALPN token.
+`ServerTLSConfig` (requires client cert, no CA verification). `ClientTLSConfig` with `VerifyPeerCertificate` callback that extracts Ed25519 pubkey from cert and delegates to a `PeerVerifier` function for TOFU. `boltALPN = "bolt/1"` as the QUIC ALPN token.
 
 **`internal/transport/quic.go`**
 `Listen()` and `Dial()` wrappers around quic-go with shared `quicConfig()` (keepalive 15s, max 1000 streams, 10s handshake timeout).
@@ -814,7 +814,7 @@ Stream type constants (`StreamHandshake`, `StreamChat`, `StreamFile`, `StreamCon
 **`internal/daemon/ipc.go`**
 `IPCServer` on Unix socket. `IPCClient` for CLI side. Length-prefixed JSON framing (same as wire protocol). Commands: `status`, `list_peers`, `id`. `StatusPayload` with fingerprint, nickname, port, online peers. `okResponse`/`errorResponse` helpers.
 
-**`cmd/flick/main.go`**
+**`cmd/bolt/main.go`**
 Four commands: `init` (generate or load identity, ensure daemon running, print fingerprint+randomart), `id` (print fingerprint+randomart), `daemon` (run in foreground), `status` (query daemon via IPC, print table).
 
 ### Build verification
@@ -826,9 +826,9 @@ go test ./internal/identity/... ./internal/proto/... -v  — 12 tests, all pass
 
 Smoke tests passed:
 ```
-flick init   — generates keypair, prints randomart, spawns daemon
-flick id     — prints same fingerprint on repeated calls (stable)
-flick status — shows nickname, fingerprint, port, 0 online peers
+bolt init   — generates keypair, prints randomart, spawns daemon
+bolt id     — prints same fingerprint on repeated calls (stable)
+bolt status — shows nickname, fingerprint, port, 0 online peers
 ```
 
 ---
@@ -836,14 +836,14 @@ flick status — shows nickname, fingerprint, port, 0 online peers
 ### Files created
 
 ```
-~/workspace/flick/
+~/workspace/bolt/
   go.mod
   go.sum
   README.md                              — full project README
   architecture.md                        — 5 Mermaid diagrams
   plan.md                                — copy of full implementation plan
-  flick-conversation-log.md              — this file
-  cmd/flick/main.go                      — CLI entry point
+  bolt-conversation-log.md              — this file
+  cmd/bolt/main.go                      — CLI entry point
   internal/identity/identity.go          — Ed25519 identity
   internal/identity/randomart.go         — drunken bishop visual fingerprint
   internal/identity/identity_test.go     — 8 unit tests

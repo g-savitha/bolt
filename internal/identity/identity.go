@@ -1,6 +1,6 @@
-// Package identity manages the cryptographic identity of a flick node.
+// Package identity manages the cryptographic identity of a bolt node.
 //
-// Each machine running flick has exactly one Ed25519 keypair. This keypair
+// Each machine running bolt has exactly one Ed25519 keypair. This keypair
 // is generated once on first run and stored on disk. The public key's
 // SHA-256 hash becomes the node's fingerprint — a stable, human-verifiable
 // identifier used to authenticate peers (TOFU model, like SSH).
@@ -30,15 +30,15 @@ const (
 	privateKeyFile = "private.key"
 	publicKeyFile  = "public.key"
 
-	privateKeyPEMType = "FLICK PRIVATE KEY"
-	publicKeyPEMType  = "FLICK PUBLIC KEY"
+	privateKeyPEMType = "bolt PRIVATE KEY"
+	publicKeyPEMType  = "bolt PUBLIC KEY"
 
 	// tlsCertValidityYears is intentionally long — we manage trust via
 	// fingerprint pinning (TOFU), not certificate expiry.
 	tlsCertValidityYears = 100
 )
 
-// Identity holds the Ed25519 keypair for this flick node.
+// Identity holds the Ed25519 keypair for this bolt node.
 // It is loaded once at startup and passed around by pointer.
 type Identity struct {
 	PrivateKey ed25519.PrivateKey
@@ -180,11 +180,11 @@ func (id *Identity) TLSCertificate() (tls.Certificate, error) {
 
 // ExtractPublicKeyFromCert extracts the Ed25519 public key that was embedded
 // in a peer's TLS certificate SubjectKeyId during TLSCertificate().
-// Returns an error if the certificate was not created by flick.
+// Returns an error if the certificate was not created by bolt.
 func ExtractPublicKeyFromCert(cert *x509.Certificate) (ed25519.PublicKey, error) {
 	if len(cert.SubjectKeyId) != ed25519.PublicKeySize {
 		return nil, fmt.Errorf(
-			"certificate SubjectKeyId has unexpected length %d (expected %d) — not a flick certificate",
+			"certificate SubjectKeyId has unexpected length %d (expected %d) — not a bolt certificate",
 			len(cert.SubjectKeyId), ed25519.PublicKeySize,
 		)
 	}

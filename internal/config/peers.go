@@ -15,24 +15,24 @@ const (
 	peersVersion  = 1
 )
 
-// TrustLevel controls how flick responds to incoming connections and file
+// TrustLevel controls how bolt responds to incoming connections and file
 // transfer requests from a specific peer.
 type TrustLevel string
 
 const (
-	// TrustAlwaysAllow means flick accepts files from this peer automatically,
+	// TrustAlwaysAllow means bolt accepts files from this peer automatically,
 	// with no prompt. The user has explicitly decided to trust this machine.
 	TrustAlwaysAllow TrustLevel = "always-allow"
 
-	// TrustAllowOnce means flick prompts for each incoming file or connection.
+	// TrustAllowOnce means bolt prompts for each incoming file or connection.
 	// This is the default for newly discovered peers — cautious but not blocking.
 	TrustAllowOnce TrustLevel = "allow-once"
 
-	// TrustBlock means flick silently rejects all connections from this peer.
+	// TrustBlock means bolt silently rejects all connections from this peer.
 	TrustBlock TrustLevel = "block"
 )
 
-// PeerRecord stores everything flick knows about a specific remote machine.
+// PeerRecord stores everything bolt knows about a specific remote machine.
 // The fingerprint is the primary key — nickname and IP can change, the
 // fingerprint is derived from the keypair and is stable for the machine's lifetime.
 type PeerRecord struct {
@@ -54,7 +54,7 @@ type PeerRecord struct {
 	// FirstSeen is when we first accepted a connection from this peer.
 	FirstSeen time.Time `toml:"first_seen"`
 
-	// ManuallyAdded is true when the user explicitly ran 'flick connect <ip>'
+	// ManuallyAdded is true when the user explicitly ran 'bolt connect <ip>'
 	// rather than discovering this peer via mDNS or relay.
 	ManuallyAdded bool `toml:"manually_added"`
 }
@@ -69,9 +69,9 @@ type peersFile struct {
 // All reads and writes go through this struct — nothing accesses peers.toml directly.
 // This ensures consistent state even when mDNS discovers multiple peers simultaneously.
 type PeerStore struct {
-	mu      sync.RWMutex
-	dir     string
-	peers   map[string]*PeerRecord // keyed by fingerprint
+	mu    sync.RWMutex
+	dir   string
+	peers map[string]*PeerRecord // keyed by fingerprint
 }
 
 // LoadPeerStore reads peers.toml from dir and returns a ready-to-use PeerStore.
@@ -101,7 +101,7 @@ func LoadPeerStore(dir string) (*PeerStore, error) {
 
 	if pf.Version > peersVersion {
 		return nil, fmt.Errorf(
-			"peers file version %d is newer than this flick binary (version %d) — please update bolt",
+			"peers file version %d is newer than this bolt binary (version %d) — please update bolt",
 			pf.Version, peersVersion,
 		)
 	}

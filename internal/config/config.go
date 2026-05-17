@@ -1,10 +1,10 @@
-// Package config manages flick's on-disk configuration.
+// Package config manages bolt's on-disk configuration.
 //
 // There are two configuration files:
 //   - config.toml: user preferences (nickname, ports, paths, relay settings)
 //   - peers.toml:  known peers and their trust levels
 //
-// Both files carry a version field so future versions of flick can migrate
+// Both files carry a version field so future versions of bolt can migrate
 // old configs forward rather than breaking on unexpected schemas.
 package config
 
@@ -20,7 +20,7 @@ const (
 	configFileName = "config.toml"
 	configVersion  = 1
 
-	// DefaultPort is the UDP port flick listens on for QUIC connections.
+	// DefaultPort is the UDP port bolt listens on for QUIC connections.
 	DefaultPort = 7799
 
 	// DefaultReceiveDir is where received files land when no override is set.
@@ -28,7 +28,7 @@ const (
 	DefaultReceiveDir = "~/Downloads"
 )
 
-// Config holds user-facing preferences for a flick node.
+// Config holds user-facing preferences for a bolt node.
 // All fields have sensible defaults so a freshly generated config works
 // without the user needing to edit anything.
 type Config struct {
@@ -46,13 +46,13 @@ type Config struct {
 	ReceiveDir string `toml:"receive_dir"`
 
 	// LogChat enables opt-in chat and transfer logging to
-	// ~/.local/share/flick/logs/. Off by default (ephemeral by design).
+	// ~/.local/share/bolt/logs/. Off by default (ephemeral by design).
 	LogChat bool `toml:"log_chat"`
 
 	// LogTransfers enables opt-in transfer history logging alongside chat logs.
 	LogTransfers bool `toml:"log_transfers"`
 
-	// Relay is the URL of the flick relay server for internet peer discovery.
+	// Relay is the URL of the bolt relay server for internet peer discovery.
 	// Empty means LAN-only mode.
 	Relay string `toml:"relay"`
 
@@ -65,7 +65,7 @@ type Config struct {
 	MaxRelayTransferBytes int64 `toml:"max_relay_transfer_bytes"`
 
 	// Stealth suppresses both mDNS broadcasting and relay registration.
-	// When true, this machine is only reachable via direct 'flick connect <ip>'.
+	// When true, this machine is only reachable via direct 'bolt connect <ip>'.
 	Stealth bool `toml:"stealth"`
 }
 
@@ -143,7 +143,7 @@ func migrate(cfg *Config) (changed bool, err error) {
 	}
 	if cfg.Version > configVersion {
 		return false, fmt.Errorf(
-			"config file version %d is newer than this flick binary (version %d) — please update bolt",
+			"config file version %d is newer than this bolt binary (version %d) — please update bolt",
 			cfg.Version, configVersion,
 		)
 	}

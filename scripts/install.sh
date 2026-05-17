@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # Install bolt from GitHub Releases.
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/g-savitha/flick/main/scripts/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/g-savitha/bolt/main/scripts/install.sh | bash
 #   ./scripts/install.sh [version]   # default: 0.1.0
 set -euo pipefail
 
 OWNER="g-savitha"
-REPO="flick"
+REPO="bolt"
 VERSION="${1:-0.1.0}"
 INSTALL_DIR="${INSTALL_DIR:-/usr/local/bin}"
 

@@ -7,26 +7,26 @@ Pick one method. Full details: [INSTALL.md](INSTALL.md).
 **macOS / Linux**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/g-savitha/flick/main/scripts/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/g-savitha/bolt/main/scripts/install.sh | bash
 ```
 
 **Windows (PowerShell)**
 
 ```powershell
-irm https://raw.githubusercontent.com/g-savitha/flick/main/scripts/install.ps1 | iex
+irm https://raw.githubusercontent.com/g-savitha/bolt/main/scripts/install.ps1 | iex
 ```
 
 **Homebrew** (after release SHA256 is set in the formula)
 
 ```bash
-brew install --formula https://raw.githubusercontent.com/g-savitha/flick/main/packaging/homebrew/Formula/bolt.rb
+brew install --formula https://raw.githubusercontent.com/g-savitha/bolt/main/packaging/homebrew/Formula/bolt.rb
 ```
 
 **From source**
 
 ```bash
-git clone https://github.com/g-savitha/flick.git
-cd flick
+git clone https://github.com/g-savitha/bolt.git
+cd bolt
 go build -o bolt ./cmd/bolt
 sudo mv bolt /usr/local/bin/
 ```
@@ -67,17 +67,17 @@ Type at `>`; `/quit` to exit. Nickname is from `bolt status` (usually hostname).
 
 ## Troubleshooting
 
-| Problem | Fix |
-|---------|-----|
-| `connect to bolt daemon` failed | `bolt init` or `bolt daemon` |
-| `peer is not connected` | Other side runs `bolt connect <your-ip>` |
-| No messages | Firewall UDP 7799; both daemons running |
+| Problem                         | Fix                                      |
+| ------------------------------- | ---------------------------------------- |
+| `connect to bolt daemon` failed | `bolt init` or `bolt daemon`             |
+| `peer is not connected`         | Other side runs `bolt connect <your-ip>` |
+| No messages                     | Firewall UDP 7799; both daemons running  |
 
 ## What's free vs paid
 
-| Feature | Cost |
-|---------|------|
-| LAN chat (`bolt connect` + `bolt chat`) | Free |
-| Internet relay (Hyd → Amsterdam, etc.) | Paid hosted service — `relay_token` in config (not in this repo) |
+| Feature                                 | Cost                                                             |
+| --------------------------------------- | ---------------------------------------------------------------- |
+| LAN chat (`bolt connect` + `bolt chat`) | Free                                                             |
+| Internet relay (Hyd → Amsterdam, etc.)  | Paid hosted service — `relay_token` in config (not in this repo) |
 
 See [INSTALL.md](INSTALL.md) for packaging. Relay server (`boltd`) stays private / separate repo.

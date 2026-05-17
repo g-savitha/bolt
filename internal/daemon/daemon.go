@@ -36,15 +36,16 @@ func New(
 	peers *config.PeerStore,
 	configDir string,
 ) *Daemon {
+	// chat.NewService requires the run context so its reader goroutines share
+	// the daemon lifetime. Run() sets d.runCtx before any peers connect, so
+	// we pass a background context here and wire the real one in Run().
 	d := &Daemon{
 		id:        id,
 		cfg:       cfg,
 		peers:     peers,
 		registry:  transport.NewPeerRegistry(),
-		chat:      chat.NewService(),
 		configDir: configDir,
 	}
-	d.chat.OnMessage(d.onChatMessage)
 	return d
 }
 
@@ -54,6 +55,12 @@ func (d *Daemon) Run(ctx context.Context) error {
 	defer cancel()
 
 	d.runCtx = ctx
+
+	// Now that the run context exists, create the chat service with it so
+	// outbound-side reader goroutines (opened by ensureChatStream) are
+	// cancelled on daemon shutdown, not just when an individual Send call ends.
+	d.chat = chat.NewService(ctx)
+	d.chat.OnMessage(d.onChatMessage)
 
 	ipcServer, err := NewIPCServer(d.configDir, d)
 	if err != nil {

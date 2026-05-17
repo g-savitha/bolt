@@ -18,7 +18,7 @@ const BoltVersion = "0.1.0"
 
 // PeerConn represents an authenticated, live QUIC connection to a remote peer.
 //
-// Every feature in flick (chat, file transfer, control messages) runs over
+// Every feature in bolt (chat, file transfer, control messages) runs over
 // streams opened on this connection. PeerConn owns the connection lifecycle —
 // when it is closed, all streams on it are also closed.
 //

@@ -1,11 +1,11 @@
-// Package transport handles the QUIC network layer for flick.
+// Package transport handles the QUIC network layer for bolt.
 //
-// Connections between flick nodes are secured with QUIC over UDP, which
+// Connections between bolt nodes are secured with QUIC over UDP, which
 // provides TLS 1.3 encryption built-in. We layer our own TOFU identity
 // verification on top of TLS rather than relying on certificate authorities.
 //
 // The TLS handshake uses self-signed certificates generated from each node's
-// Ed25519 keypair. After TLS completes, both sides perform a flick-level
+// Ed25519 keypair. After TLS completes, both sides perform a bolt-level
 // handshake to verify the embedded Ed25519 identity (see peer_conn.go).
 package transport
 
@@ -17,9 +17,9 @@ import (
 	"github.com/bolt/bolt/internal/identity"
 )
 
-// flickALPN is the Application-Layer Protocol Negotiation token for flick.
+// boltALPN is the Application-Layer Protocol Negotiation token for bolt.
 // quic-go requires at least one ALPN token. Using our own makes it clear
-// this is a flick connection and not another QUIC-based protocol.
+// this is a bolt connection and not another QUIC-based protocol.
 const boltALPN = "bolt/1"
 
 // ServerTLSConfig returns a TLS configuration for the QUIC listener.

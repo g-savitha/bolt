@@ -1,4 +1,4 @@
-# flick — Terminal P2P LAN + Internet Chat & File Transfer Tool
+# bolt — Terminal P2P LAN + Internet Chat & File Transfer Tool
 
 ## Context
 
@@ -10,25 +10,25 @@ The gap this fills: no existing tool combines terminal-native UX + authenticated
 
 ## Design Decisions (All Confirmed)
 
-| Decision | Choice |
-|---|---|
-| Language | Go |
-| Transport | QUIC over UDP (`quic-go`) |
-| Identity | Ed25519 keypair per machine, TOFU (SSH-style) |
-| Peer discovery | mDNS primary + manual IP fallback for VPN/internet |
-| Internet path | `pion/ice` hole-punching + `coturn` TURN fallback + configurable relay |
-| File transfer | Chunked parallel QUIC streams, SHA-256 verified, resumable, path-aware chunk size |
-| Chat persistence | Ephemeral by default; opt-in local logging via `--log` |
-| Trust model | per-peer: `always-allow` / `allow-once` (default) / `block` |
-| Daemon | Auto-spawn on first command (like ssh-agent); Unix socket IPC with `flock` PID guard |
-| TUI | charmbracelet/bubbletea + bubbles + lipgloss |
-| Relay storage | `modernc.org/sqlite` (pure Go, no CGO) — survives restarts, cross-compiles cleanly |
-| Wire versioning | All messages carry `"v":1`; config files carry `version = 1` |
-| Relay auth | Per-peer HMAC tokens: `HMAC(relay_secret, peer_fingerprint)` — no shared secrets |
-| Relay TLS | Let's Encrypt via `autocert` if domain available; self-signed + client-pinned if IP-only |
-| Platform support | Linux + macOS v1; Windows explicitly unsupported (Unix socket IPC incompatible) |
-| Receive directory | Configurable `receive_dir` in `config.toml`; default `~/Downloads` |
-| Chunk size | Path-aware: 4MB on LAN, 256KB over TURN relay |
+| Decision          | Choice                                                                                   |
+| ----------------- | ---------------------------------------------------------------------------------------- |
+| Language          | Go                                                                                       |
+| Transport         | QUIC over UDP (`quic-go`)                                                                |
+| Identity          | Ed25519 keypair per machine, TOFU (SSH-style)                                            |
+| Peer discovery    | mDNS primary + manual IP fallback for VPN/internet                                       |
+| Internet path     | `pion/ice` hole-punching + `coturn` TURN fallback + configurable relay                   |
+| File transfer     | Chunked parallel QUIC streams, SHA-256 verified, resumable, path-aware chunk size        |
+| Chat persistence  | Ephemeral by default; opt-in local logging via `--log`                                   |
+| Trust model       | per-peer: `always-allow` / `allow-once` (default) / `block`                              |
+| Daemon            | Auto-spawn on first command (like ssh-agent); Unix socket IPC with `flock` PID guard     |
+| TUI               | charmbracelet/bubbletea + bubbles + lipgloss                                             |
+| Relay storage     | `modernc.org/sqlite` (pure Go, no CGO) — survives restarts, cross-compiles cleanly       |
+| Wire versioning   | All messages carry `"v":1`; config files carry `version = 1`                             |
+| Relay auth        | Per-peer HMAC tokens: `HMAC(relay_secret, peer_fingerprint)` — no shared secrets         |
+| Relay TLS         | Let's Encrypt via `autocert` if domain available; self-signed + client-pinned if IP-only |
+| Platform support  | Linux + macOS v1; Windows explicitly unsupported (Unix socket IPC incompatible)          |
+| Receive directory | Configurable `receive_dir` in `config.toml`; default `~/Downloads`                       |
+| Chunk size        | Path-aware: 4MB on LAN, 256KB over TURN relay                                            |
 
 ---
 
@@ -38,28 +38,28 @@ The gap this fills: no existing tool combines terminal-native UX + authenticated
 Every on-wire message type includes `"v": 1`. Clients reject unknown versions gracefully. Config files include `version = 1`; missing fields get written with defaults on load (forward-compatible migration).
 
 **Relay rate limiting**
-`flickd` enforces per-IP token bucket: 10 req/s, burst 100. Applied to registration, heartbeat, and hole-punch endpoints. Prevents trivial DoS.
+`boltd` enforces per-IP token bucket: 10 req/s, burst 100. Applied to registration, heartbeat, and hole-punch endpoints. Prevents trivial DoS.
 
 **Peer nickname vs identity**
 Nicknames are display-only and mutable. Canonical identity is always the fingerprint. CLI resolves peer names via fingerprint lookup. Ambiguous nicknames prompt for disambiguation. `peers.toml` uses fingerprint as primary key.
 
 **Peer registry TTL + heartbeat**
-Peers heartbeat the relay every 30s. Relay marks offline after 90s (3 missed). Background goroutine in `flickd` prunes stale entries every 60s. `flick peers` never shows ghost peers.
+Peers heartbeat the relay every 30s. Relay marks offline after 90s (3 missed). Background goroutine in `boltd` prunes stale entries every 60s. `bolt peers` never shows ghost peers.
 
 **File transfer size limits**
 Configurable `max_relay_transfer` in `config.toml` (default: 5GB over TURN). No limit on LAN. Receiver checks available disk space before sending `TransferAck{Accepted:true}` — rejects with clear error if insufficient. Sender warned before initiating over-limit transfer.
 
 **Group chat fan-out scope**
-Fan-out only to peers with mutual established trust. Skipped peers reported to sender. File broadcast (`flick send --all`) explicitly blocked in v1. Documented limitation.
+Fan-out only to peers with mutual established trust. Skipped peers reported to sender. File broadcast (`bolt send --all`) explicitly blocked in v1. Documented limitation.
 
 **Relay access control — per-peer HMAC tokens**
 Each peer's relay token = `HMAC-SHA256(relay_secret, peer_fingerprint)`. Relay verifies without storing a token list. Revoking one peer (add fingerprint to a blocklist) doesn't affect others. No shared secret that leaks access for everyone.
 
 **Transfer history**
-No history by default. With `--log` or `log_transfers = true` in config: `~/.local/share/flick/logs/transfers-YYYY-MM-DD.log`. Format: `timestamp | direction | filename | size | peer | sha256 | duration`.
+No history by default. With `--log` or `log_transfers = true` in config: `~/.local/share/bolt/logs/transfers-YYYY-MM-DD.log`. Format: `timestamp | direction | filename | size | peer | sha256 | duration`.
 
 **Stealth mode scope**
-`--stealth` suppresses both mDNS announce and relay registration. Machine fully dark — reachable only via direct `flick connect <ip>`. Documented explicitly.
+`--stealth` suppresses both mDNS announce and relay registration. Machine fully dark — reachable only via direct `bolt connect <ip>`. Documented explicitly.
 
 **TOFU fingerprint UX**
 Confirmation screen shows: full hex fingerprint + SSH-style randomart visual + instruction to verify out-of-band + `Accept? [y/N]`. Randomart implemented via `golang.org/x/crypto/ssh` internal algorithm (copy the ~80-line drunken bishop implementation — it's MIT licensed and not exported).
@@ -79,23 +79,23 @@ All reads and writes to `peers.toml` go through a single `PeerStore` struct prot
 **Daemon PID race condition**
 `EnsureDaemon()` acquires an exclusive `flock` on `daemon.pid` before reading or writing. If two CLI processes race, the second blocks until the first has either confirmed a running daemon or spawned one and released the lock. No double-spawn possible.
 
-**`flick send` partial failure behaviour**
+**`bolt send` partial failure behaviour**
 When sending to multiple peers, offline peers are skipped (not errors). Summary printed after all attempts: `✓ peer1 (2.3s)  ✗ peer2 (offline)  ✓ peer3 (1.1s)`. Exit code 0 if at least one succeeded, non-zero if all failed. Individual peer failures never abort in-progress transfers to other peers.
 
 **Receive directory**
-Configurable `receive_dir` in `config.toml`. Default: `~/Downloads`. Receiver resolves final filename at the point `TransferDone` is verified — never overwrites existing files (appends `_1`, `_2` suffix). User can override per-session with `flick receive-dir /tmp` (sets for current daemon session only).
+Configurable `receive_dir` in `config.toml`. Default: `~/Downloads`. Receiver resolves final filename at the point `TransferDone` is verified — never overwrites existing files (appends `_1`, `_2` suffix). User can override per-session with `bolt receive-dir /tmp` (sets for current daemon session only).
 
 **Path-aware chunk size**
 LAN path: 4MB chunks (maximises throughput on gigabit). TURN relay path: 256KB chunks (reduces per-chunk round-trip cost on slower connections). Detection: if connection was established via ICE direct, use LAN chunk size; if via TURN, use relay chunk size. Negotiated in `FileHeader`.
 
-**`flick chat --all` trust guard**
+**`bolt chat --all` trust guard**
 Fan-out skips peers that have not completed mutual TOFU or have trust level `block`. Sends only to peers in `PeerRegistry` with authenticated `PeerConn`. Skipped peers logged to stderr: `skipped peer3 — trust not established`.
 
 **Config file versioning and migration**
 Both `config.toml` and `peers.toml` include `version = 1`. On load, if version is missing, assume 0 and run migration (write defaults for all missing fields, bump version). If version is higher than understood, warn and exit rather than silently misparse.
 
 **Relay TLS**
-If `relay_domain` is set in `flickd.toml`: use `golang.org/x/crypto/acme/autocert` for automatic Let's Encrypt cert. If not set (IP-only deployment): generate self-signed cert on first start, store in `flickd_cert.pem`. Clients must pin the relay's cert fingerprint in `config.toml` (`relay_cert_fingerprint`). Documented in deploy guide.
+If `relay_domain` is set in `boltd.toml`: use `golang.org/x/crypto/acme/autocert` for automatic Let's Encrypt cert. If not set (IP-only deployment): generate self-signed cert on first start, store in `boltd_cert.pem`. Clients must pin the relay's cert fingerprint in `config.toml` (`relay_cert_fingerprint`). Documented in deploy guide.
 
 **Test strategy**
 Unit tests required for: `internal/identity/` (keygen, fingerprint determinism), `internal/transfer/chunk.go` (chunking, hash correctness), `internal/proto/wire.go` (framing encode/decode round-trips), `internal/config/` (TOML load/save, migration). Integration tests required for: TOFU handshake flow (two in-process QUIC endpoints), full file transfer with corruption injection, resume after mid-transfer kill. No mocks for crypto or network — use real implementations with loopback.
@@ -105,18 +105,18 @@ Unit tests required for: `internal/identity/` (keygen, fingerprint determinism),
 ## CLI Interface
 
 ```bash
-flick init                           # generate keypair, start daemon
-flick id                             # show your fingerprint + randomart
-flick peers                          # list online peers (LAN + relay)
-flick connect <ip>                   # manually add peer (VPN / internet)
-flick trust <peer> always|once|block # set per-peer trust level
-flick send <file> <peer> [peer2...]  # send file; reports per-peer success/fail
-cat file | flick send - <peer>       # pipe support
-flick chat <peer>                    # 1:1 TUI chat
-flick chat --all                     # group chat (trusted peers only)
-flick daemon [--stealth]             # explicit daemon; --stealth = fully dark
-flick status                         # daemon stats, peers, transfers, relay status
-flick receive-dir <path>             # set receive directory for this session
+bolt init                           # generate keypair, start daemon
+bolt id                             # show your fingerprint + randomart
+bolt peers                          # list online peers (LAN + relay)
+bolt connect <ip>                   # manually add peer (VPN / internet)
+bolt trust <peer> always|once|block # set per-peer trust level
+bolt send <file> <peer> [peer2...]  # send file; reports per-peer success/fail
+cat file | bolt send - <peer>       # pipe support
+bolt chat <peer>                    # 1:1 TUI chat
+bolt chat --all                     # group chat (trusted peers only)
+bolt daemon [--stealth]             # explicit daemon; --stealth = fully dark
+bolt status                         # daemon stats, peers, transfers, relay status
+bolt receive-dir <path>             # set receive directory for this session
 ```
 
 ---
@@ -124,10 +124,10 @@ flick receive-dir <path>             # set receive directory for this session
 ## Project Structure
 
 ```
-flick/
+bolt/
 ├── cmd/
-│   ├── flick/main.go               # cobra root + subcommand wiring
-│   └── flickd/main.go              # relay server binary
+│   ├── bolt/main.go               # cobra root + subcommand wiring
+│   └── boltd/main.go              # relay server binary
 ├── internal/
 │   ├── identity/
 │   │   ├── identity.go             # Ed25519 keygen, load, TLS cert
@@ -172,14 +172,14 @@ flick/
 │       ├── wire_test.go            # round-trip framing tests
 │       └── ipc.go                  # IPC request/response/event types
 ├── relay/
-│   ├── server.go                   # flickd HTTP(S) server, rate limiter
+│   ├── server.go                   # boltd HTTP(S) server, rate limiter
 │   ├── registry.go                 # SQLite peer registry (modernc.org/sqlite)
 │   ├── auth.go                     # HMAC token verification + blocklist
 │   └── tls.go                      # autocert or self-signed cert management
 ├── deploy/
-│   ├── flickd.toml.example         # relay config template
+│   ├── boltd.toml.example         # relay config template
 │   ├── coturn.conf.example         # coturn config template
-│   └── flickd.service              # systemd unit for relay
+│   └── boltd.service              # systemd unit for relay
 ├── go.mod
 └── Makefile
 ```
@@ -187,7 +187,7 @@ flick/
 ### Storage Layout
 
 ```
-~/.config/flick/
+~/.config/bolt/
   identity/private.key     (0600)
   identity/public.key
   peers.toml               # version=1; fingerprint→{name,ip,trust,first_seen}
@@ -195,7 +195,7 @@ flick/
   daemon.sock              # Unix socket (runtime, deleted on clean shutdown)
   daemon.pid               # flock-protected PID file
 
-~/.local/share/flick/
+~/.local/share/bolt/
   logs/<peer>-YYYY-MM-DD.log         # opt-in chat logs
   logs/transfers-YYYY-MM-DD.log      # opt-in transfer history
   incomplete/<uuid>.json             # resume state
@@ -230,19 +230,19 @@ Length-prefixed JSON over Unix socket. Commands: `status`, `send_file`, `send_ch
 ### Phase 1 — Core Transport (Week 1-2)
 **Goal:** Two machines establish an authenticated encrypted QUIC connection.
 
-1. Scaffold: `go mod init github.com/<user>/flick`, cobra skeleton, all subcommand stubs, Makefile
+1. Scaffold: `go mod init github.com/<user>/bolt`, cobra skeleton, all subcommand stubs, Makefile
 2. `internal/identity/`: Ed25519 keygen → PEM files (private 0600); `Fingerprint()` = colon-hex SHA-256; `TLSCertificate()` = self-signed x509; randomart from drunken-bishop; unit tests
 3. `internal/config/`: versioned load/save with migration; `PeerStore` with `sync.RWMutex`; unit tests for migration
 4. `internal/transport/tls.go`: server config (`RequireAnyClientCert`); client config with `VerifyPeerCertificate` for TOFU
 5. `internal/transport/quic.go`: `Listen()` and `Dial()` wrappers; `MaxIncomingStreams:1000`, `KeepAlivePeriod:15s`
 6. TOFU handshake: TLS completes → extract fingerprint → lookup in PeerStore → unknown: push `tofu_prompt` IPC event, wait 30s → accepted: write PeerStore → exchange `HandshakeMsg` → emit `peer_online`
 7. Signal handling in `daemon.go`: `SIGTERM`/`SIGINT` → checkpoint transfers → cleanup socket/PID → exit
-8. `flick init`: keygen + versioned config + flock-guarded daemon spawn
-9. `flick id`: load identity, print fingerprint + randomart
+8. `bolt init`: keygen + versioned config + flock-guarded daemon spawn
+9. `bolt id`: load identity, print fingerprint + randomart
 
 **Phase 1 verification:**
-- `flick init` → identity files exist, correct permissions
-- `flick id` → same fingerprint on repeated calls
+- `bolt init` → identity files exist, correct permissions
+- `bolt id` → same fingerprint on repeated calls
 - `tcpdump` on UDP 7799 → zero plaintext
 - Unknown peer → TOFU prompt with randomart; second connection → no prompt
 - Kill daemon mid-operation → no stale socket, clean PID
@@ -250,7 +250,7 @@ Length-prefixed JSON over Unix socket. Commands: `status`, `send_file`, `send_ch
 ---
 
 ### Phase 2 — File Transfer (Week 2-3)
-**Goal:** `flick send file peername` with progress, hash verification, resume, disk-space guard.
+**Goal:** `bolt send file peername` with progress, hash verification, resume, disk-space guard.
 
 1. `internal/transfer/chunk.go`: `ChunkFile(r io.Reader, chunkSize int)` → `<-chan Chunk`; per-chunk + whole-file SHA-256; unit tests for hash correctness and chunk boundary handling
 2. `internal/transfer/sender.go`:
@@ -265,7 +265,7 @@ Length-prefixed JSON over Unix socket. Commands: `status`, `send_file`, `send_ch
    - On `TransferDone`: verify whole-file SHA-256; rename to `receive_dir/<filename>` (no overwrite — append `_1` suffix)
 4. `internal/transfer/progress.go`: emit `transfer_progress` IPC events; CLI renders `bubbles/progress` bar
 5. Stdin: buffer to `incomplete/pipe-<uuid>.tmp`; daemon sends that file
-6. `flick send` multi-peer: parallel sends; collect results; print per-peer summary; exit code reflects overall success
+6. `bolt send` multi-peer: parallel sends; collect results; print per-peer summary; exit code reflects overall success
 7. Integration test: full transfer with injected chunk corruption → retry → arrival; mid-transfer kill → resume
 
 ---
@@ -273,19 +273,19 @@ Length-prefixed JSON over Unix socket. Commands: `status`, `send_file`, `send_ch
 ### Phase 3 — Peer Discovery + Daemon (Week 3-4)
 **Goal:** LAN auto-discovery; daemon auto-spawns with race-safe PID handling.
 
-1. `internal/discovery/mdns.go`: `Announce()` registers `_flick._udp`; `Browse()` emits `DiscoveredPeer`
+1. `internal/discovery/mdns.go`: `Announce()` registers `_bolt._udp`; `Browse()` emits `DiscoveredPeer`
 2. `internal/discovery/registry.go`: `PeerRegistry` (`map[fingerprint]*PeerConn`, `sync.RWMutex`); on discovery → dial → authenticate → `Add()`; on disconnect → `Remove()` + `peer_offline` event
 3. `internal/daemon/daemon.go`: QUIC listener + mDNS + IPC server; stream type routing; signal handlers
 4. `internal/daemon/spawn.go`: `flock` on `daemon.pid` before read/write; re-exec via `os.Executable()` with `Setsid:true`; poll socket max 2s
 5. `internal/daemon/ipc_server.go`: `[4-byte len][JSON]` framing; fan-out events to subscribers
-6. `flick peers`: `EnsureDaemon()` → `CmdListPeers` → lipgloss table with online/offline indicators
-7. `flick connect <ip>`: `CmdConnect` → daemon dials → TOFU flow
+6. `bolt peers`: `EnsureDaemon()` → `CmdListPeers` → lipgloss table with online/offline indicators
+7. `bolt connect <ip>`: `CmdConnect` → daemon dials → TOFU flow
 8. Stealth: `Config.Stealth=true` → skip `Announce()` only (Browse still runs for passive discovery)
 
 **Phase 3 verification:**
-- Two machines on same LAN → `flick peers` lists each other within 5s
-- Two terminals run `flick peers` simultaneously → single daemon spawned (no race)
-- `--stealth` machine absent from peers list; reachable via `flick connect`
+- Two machines on same LAN → `bolt peers` lists each other within 5s
+- Two terminals run `bolt peers` simultaneously → single daemon spawned (no race)
+- `--stealth` machine absent from peers list; reachable via `bolt connect`
 
 ---
 
@@ -297,15 +297,15 @@ Length-prefixed JSON over Unix socket. Commands: `status`, `send_file`, `send_ch
 3. `internal/chat/fanout.go`: `Fanout(registry, msg)` → sends only to peers with established `PeerConn`; returns skipped list
 4. `internal/chat/log.go`: daily log `logs/<peer>-YYYY-MM-DD.log`; opt-in only
 5. `internal/tui/chat_model.go`: `viewport` (scrollable history) + `textinput` (message entry); handles `tea.WindowSizeMsg` for resize; Ctrl+C to quit
-6. `flick chat <peer>`: `EnsureDaemon()` → bubbletea program
-7. `flick chat --all`: same model; `GroupID` set; daemon uses `Fanout`; skipped peers printed to stderr
+6. `bolt chat <peer>`: `EnsureDaemon()` → bubbletea program
+7. `bolt chat --all`: same model; `GroupID` set; daemon uses `Fanout`; skipped peers printed to stderr
 
 ---
 
 ### Phase 5 — Internet Path + Relay (Week 5-7)
-**Goal:** flick works across the internet via self-hosted relay.
+**Goal:** bolt works across the internet via self-hosted relay.
 
-1. `relay/` package — `flickd` binary:
+1. `relay/` package — `boltd` binary:
    - HTTPS server (`autocert` if domain set; self-signed + pinned if IP-only)
    - `modernc.org/sqlite` peer registry with TTL + heartbeat pruning
    - Per-IP token bucket rate limiting
@@ -317,13 +317,13 @@ Length-prefixed JSON over Unix socket. Commands: `status`, `send_file`, `send_ch
    - After ICE: wrap established UDP socket as `net.PacketConn` → pass to `quic-go` `Transport` API (not `DialAddr`)
    - Record path type (`LAN` / `TURN`) on `PeerConn` → chunk size selection in `FileHeader`
 3. `internal/discovery/relay.go`: register on startup (unless stealth); heartbeat every 30s; lookup peers by fingerprint
-4. `deploy/`: `flickd.toml.example`, `coturn.conf.example`, `flickd.service` (systemd)
+4. `deploy/`: `boltd.toml.example`, `coturn.conf.example`, `boltd.service` (systemd)
 5. Relay endpoint configurable: `relay = "https://relay.example.com"` in `config.toml`; `relay_cert_fingerprint` for self-signed pinning
 6. Stealth updated: suppresses both mDNS and relay registration
 
 **Phase 5 verification:**
 - Machine A (Hyderabad) and Machine B (Amsterdam) connect via relay
-- `flick peers` shows remote peer; `flick send` delivers file
+- `bolt peers` shows remote peer; `bolt send` delivers file
 - File SHA-256 matches across internet transfer
 - Kill relay mid-transfer: transfer fails gracefully with clear error, not hang
 
@@ -336,7 +336,7 @@ Length-prefixed JSON over Unix socket. Commands: `status`, `send_file`, `send_ch
 2. Transfer log when `--log` active: `logs/transfers-YYYY-MM-DD.log`
 3. Error message audit: every user-visible error must be actionable. Replace all generic "connection failed" with specific guidance.
 4. Cross-compile Makefile: `linux/amd64`, `linux/arm64`, `darwin/amd64`, `darwin/arm64` — Windows explicitly excluded with comment
-5. `flick status`: relay connection status, active transfers with progress, peer list
+5. `bolt status`: relay connection status, active transfers with progress, peer list
 
 ---
 
@@ -362,22 +362,22 @@ coturn                              battle-tested TURN server
 
 ## Critical Files (Implement These Carefully)
 
-| File | Why |
-|---|---|
-| `internal/transport/peer_conn.go` | Every feature passes through here — QUIC stream routing, path type, registry lifecycle |
-| `internal/transport/ice.go` | pion/ice → quic-go `Transport` API bridge is the hardest plumbing in the project |
-| `internal/daemon/daemon.go` | Orchestrates all subsystems; signal handling must be correct or data is lost |
-| `internal/proto/wire.go` | All on-wire types; framing correctness determines all peer communication |
-| `internal/transfer/receiver.go` | Most complex state machine: trust, disk check, resume, concurrent writes, SHA-256 verify |
-| `internal/daemon/ipc_server.go` | Unix socket framing + event fan-out — foundation for all CLI commands and TUI |
-| `relay/auth.go` | HMAC token verification + blocklist — security boundary of the relay |
+| File                              | Why                                                                                      |
+| --------------------------------- | ---------------------------------------------------------------------------------------- |
+| `internal/transport/peer_conn.go` | Every feature passes through here — QUIC stream routing, path type, registry lifecycle   |
+| `internal/transport/ice.go`       | pion/ice → quic-go `Transport` API bridge is the hardest plumbing in the project         |
+| `internal/daemon/daemon.go`       | Orchestrates all subsystems; signal handling must be correct or data is lost             |
+| `internal/proto/wire.go`          | All on-wire types; framing correctness determines all peer communication                 |
+| `internal/transfer/receiver.go`   | Most complex state machine: trust, disk check, resume, concurrent writes, SHA-256 verify |
+| `internal/daemon/ipc_server.go`   | Unix socket framing + event fan-out — foundation for all CLI commands and TUI            |
+| `relay/auth.go`                   | HMAC token verification + blocklist — security boundary of the relay                     |
 
 ---
 
 ## Known Limitations (v1, Document Clearly)
 
 - Windows not supported (Unix socket IPC)
-- File broadcast (`flick send file --all`) not supported
+- File broadcast (`bolt send file --all`) not supported
 - Group chat is sender-side fan-out (N copies of each message)
 - No message queuing — both peers must be online simultaneously to chat or transfer
 - Relay sees peer IP addresses and online presence (stated privacy tradeoff)
@@ -388,7 +388,7 @@ coturn                              battle-tested TURN server
 
 ## Verification Per Phase
 
-**Phase 1:** identity files created, correct permissions; same fingerprint on repeated `flick id`; tcpdump shows zero plaintext; TOFU prompt on first contact; clean shutdown leaves no stale socket
+**Phase 1:** identity files created, correct permissions; same fingerprint on repeated `bolt id`; tcpdump shows zero plaintext; TOFU prompt on first contact; clean shutdown leaves no stale socket
 
 **Phase 2:** SHA-256 matches on received file; resume after kill completes faster; disk-full rejection surfaces clear error; multi-peer send reports per-peer result
 
