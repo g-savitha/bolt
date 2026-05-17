@@ -1,15 +1,26 @@
 # Install bolt from GitHub Releases (Windows).
 # Usage:
 #   irm https://raw.githubusercontent.com/g-savitha/bolt/main/scripts/install.ps1 | iex
-#   .\scripts\install.ps1 [-Version 0.1.0]
+#   .\scripts\install.ps1 [-Version 0.1.1]
 param(
-    [string]$Version = "0.1.0",
+    [string]$Version = "",
     [string]$InstallDir = "$env:LOCALAPPDATA\Programs\bolt"
 )
 
 $ErrorActionPreference = "Stop"
 $Owner = "g-savitha"
 $Repo = "bolt"
+
+# Resolve version: explicit param > latest release from GitHub API
+if ($Version -eq "") {
+    $ApiUrl = "https://api.github.com/repos/$Owner/$Repo/releases/latest"
+    $Release = Invoke-RestMethod -Uri $ApiUrl -UseBasicParsing
+    $Version = $Release.tag_name -replace '^v', ''
+    if (-not $Version) {
+        throw "Could not resolve latest release from GitHub API"
+    }
+}
+
 $Asset = "bolt_${Version}_windows_amd64.zip"
 $Url = "https://github.com/$Owner/$Repo/releases/download/v$Version/$Asset"
 

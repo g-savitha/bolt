@@ -2,12 +2,25 @@
 # Install bolt from GitHub Releases.
 # Usage:
 #   curl -fsSL https://raw.githubusercontent.com/g-savitha/bolt/main/scripts/install.sh | bash
-#   ./scripts/install.sh [version]   # default: 0.1.0
+#   ./scripts/install.sh [version]   # default: latest
 set -euo pipefail
 
 OWNER="g-savitha"
 REPO="bolt"
-VERSION="${1:-0.1.0}"
+
+# Resolve version: explicit arg > env var > latest release from GitHub API
+if [ "${1:-}" != "" ]; then
+  VERSION="$1"
+elif [ "${BOLT_VERSION:-}" != "" ]; then
+  VERSION="$BOLT_VERSION"
+else
+  VERSION="$(curl -fsSL "https://api.github.com/repos/${OWNER}/${REPO}/releases/latest" \
+    | grep '"tag_name"' | head -1 | sed 's/.*"tag_name": *"v\([^"]*\)".*/\1/')"
+  if [ -z "$VERSION" ]; then
+    echo "error: could not resolve latest release from GitHub API" >&2
+    exit 1
+  fi
+fi
 INSTALL_DIR="${INSTALL_DIR:-/usr/local/bin}"
 
 os="$(uname -s | tr '[:upper:]' '[:lower:]')"
