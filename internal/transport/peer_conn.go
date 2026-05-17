@@ -14,7 +14,8 @@ import (
 
 // BoltVersion is the current application version, sent during handshake.
 // Peers use this for display only — not for protocol compatibility gating.
-const BoltVersion = "0.1.0"
+// Set at build time via: -ldflags "-X github.com/bolt/bolt/internal/transport.BoltVersion=x.y.z"
+var BoltVersion = "dev"
 
 // PeerConn represents an authenticated, live QUIC connection to a remote peer.
 //
