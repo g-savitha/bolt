@@ -45,6 +45,15 @@ archives:
 checksum:
   name_template: "SHA256SUMS"
 
+# SBOM (Software Bill of Materials) — one SBOM per archive, attached to the release.
+# Requires syft to be available; GoReleaser installs it automatically.
+# Consumers can use the .sbom files to audit the full dependency tree for CVEs.
+sboms:
+  - id: archive-sbom
+    artifacts: archive
+    documents:
+      - "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}.sbom"
+
 changelog:
   sort: asc
   filters:

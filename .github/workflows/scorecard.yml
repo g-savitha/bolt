@@ -1,0 +1,42 @@
+name: scorecard
+
+on:
+  # Weekly run — audits the overall security posture of the repo.
+  schedule:
+    - cron: "30 8 * * 1"
+  push:
+    branches: ["main"]
+
+permissions: read-all
+
+jobs:
+  analysis:
+    name: ossf-scorecard
+    runs-on: ubuntu-latest
+    permissions:
+      # Needed to upload SARIF results to the Security tab.
+      security-events: write
+      # Needed for the Scorecard action to read workflow files.
+      actions: read
+      contents: read
+      # Needed if the repo is private (to list collaborators, etc.).
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Run OSSF Scorecard
+        uses: ossf/scorecard-action@v2.4.0
+        with:
+          results_file: scorecard-results.sarif
+          results_format: sarif
+          # Publish results to the OpenSSF API (shows public badge on GitHub).
+          publish_results: true
+
+      - name: Upload Scorecard SARIF to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: scorecard-results.sarif
+          category: ossf-scorecard

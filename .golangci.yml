@@ -1,0 +1,53 @@
+version: "2"
+
+linters:
+  enable:
+    # security
+    - gosec        # OWASP Top 10 patterns: hardcoded creds, weak crypto, path traversal, etc.
+    # correctness
+    - govet        # suspicious constructs (e.g. printf format mismatches)
+    - staticcheck  # comprehensive static analysis + deprecated API usage
+    - errcheck     # unhandled errors
+    - ineffassign  # assignments whose value is never used
+    - unused       # unused code
+    # style / readability
+    - misspell     # common English spelling mistakes in comments/strings
+    - gofmt        # standard formatting
+    - whitespace   # unnecessary blank lines
+
+linters-settings:
+  gosec:
+    # Report all issues; individual suppressions are done inline with //nolint:gosec + reason.
+    confidence: low
+    severity: low
+    excludes: []
+
+  govet:
+    enable-all: true
+    disable:
+      - shadow  # too noisy for idiomatic Go
+
+  errcheck:
+    # Ignore errors from fmt.Print* family — acceptable in CLI output paths.
+    ignore: "fmt:.*"
+    check-type-assertions: true
+
+  staticcheck:
+    checks: ["all"]
+
+issues:
+  # Don't report the same issue in test files that we accept in production code.
+  exclude-rules:
+    - path: "_test\\.go"
+      linters:
+        - gosec
+        - errcheck
+
+  # Max issues per linter before the run is aborted.
+  max-issues-per-linter: 0
+  max-same-issues: 0
+
+run:
+  timeout: 5m
+  # Fail on new issues introduced in a PR (CI sets --new-from-rev).
+  go: "1.22"
