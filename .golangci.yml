@@ -1,60 +1,55 @@
+version: "2"
+
 linters:
   enable:
-    # security
-    - gosec        # OWASP Top 10 patterns: hardcoded creds, weak crypto, path traversal, etc.
+    # security — maps directly to OWASP Top 10 Go patterns
+    - gosec
     # correctness
-    - govet        # suspicious constructs (e.g. printf format mismatches)
-    - staticcheck  # comprehensive static analysis + deprecated API usage
-    - errcheck     # unhandled errors
-    - ineffassign  # assignments whose value is never used
-    - unused       # unused code
+    - govet
+    - staticcheck
+    - errcheck
+    - ineffassign
+    - unused
     # style / readability
-    - misspell     # common English spelling mistakes in comments/strings
-    - gofmt        # standard formatting
-    - whitespace   # unnecessary blank lines
+    - misspell
+    - gofmt
+    - whitespace
 
-linters-settings:
-  gosec:
-    # Report all issues; individual suppressions are done inline with //nolint:gosec + reason.
-    confidence: low
-    severity: low
-    excludes: []
+  settings:
+    gosec:
+      # Report everything; individual suppressions via //nolint:gosec with a reason.
+      confidence: low
+      severity: low
 
-  govet:
-    enable-all: true
-    disable:
-      - shadow  # too noisy for idiomatic Go
+    govet:
+      enable-all: true
+      disable:
+        - shadow  # too noisy for idiomatic Go
 
-  errcheck:
-    # Ignore errors from fmt.Print* family — acceptable in CLI output paths.
-    exclude-functions:
-      - fmt.Print
-      - fmt.Println
-      - fmt.Printf
-      - fmt.Fprint
-      - fmt.Fprintln
-      - fmt.Fprintf
-    check-type-assertions: true
+    errcheck:
+      # Ignore errors from fmt.Print* family — acceptable in CLI output paths.
+      exclude-functions:
+        - fmt.Print
+        - fmt.Println
+        - fmt.Printf
+        - fmt.Fprint
+        - fmt.Fprintln
+        - fmt.Fprintf
+      check-type-assertions: true
 
-  staticcheck:
-    checks: ["all"]
+    staticcheck:
+      checks: ["all"]
 
 issues:
-  # Don't report the same issue in test files that we accept in production code.
   exclude-rules:
+    # Test files get a relaxed security and error-check policy.
     - path: "_test\\.go"
       linters:
         - gosec
         - errcheck
 
-  # Max issues per linter before the run is aborted.
   max-issues-per-linter: 0
   max-same-issues: 0
 
 run:
   timeout: 5m
-  # Cap the Go version golangci-lint targets. golangci-lint 1.64 is built with
-  # Go 1.24 and refuses to run if go.mod declares a higher version. Linting
-  # behaviour is identical between 1.24 and 1.25; bump this when a new
-  # golangci-lint release ships with Go 1.25 support.
-  go: "1.24"
