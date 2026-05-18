@@ -58,7 +58,7 @@ func ClientTLSConfig(id *identity.Identity, onUnknownPeer PeerVerifier) (*tls.Co
 		Certificates: []tls.Certificate{cert},
 		// We skip standard CA verification and do our own fingerprint-based check.
 		InsecureSkipVerify: true, //nolint:gosec // intentional: we verify via fingerprint below
-		VerifyPeerCertificate: func(rawCerts [][]byte, _ [][]*x509.Certificate) error {
+		VerifyPeerCertificate: func(rawCerts [][]byte, _ [][]*x509.Certificate) error { //nolint:gosec // G123: session resumption is irrelevant — QUIC does not use TLS session tickets in the same way; fingerprint check in VerifyPeerCertificate is always enforced
 			return verifyPeerCertificate(rawCerts, onUnknownPeer)
 		},
 		NextProtos: []string{boltALPN},

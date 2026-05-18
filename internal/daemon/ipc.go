@@ -11,12 +11,12 @@ import (
 
 // IPC commands — extend this set as features grow.
 const (
-	CmdStatus     = "status"
-	CmdListPeers  = "list_peers"
-	CmdDaemonID   = "id"
-	CmdConnect    = "connect"
-	CmdSendChat   = "send_chat"
-	CmdSubscribe  = "subscribe"
+	CmdStatus    = "status"
+	CmdListPeers = "list_peers"
+	CmdDaemonID  = "id"
+	CmdConnect   = "connect"
+	CmdSendChat  = "send_chat"
+	CmdSubscribe = "subscribe"
 )
 
 // IPCRequest is sent by the CLI to the daemon.
@@ -76,12 +76,12 @@ type SendChatPayload struct {
 
 // IPCServer handles local CLI connections.
 type IPCServer struct {
-	ln       net.Listener
-	daemon   *Daemon
-	token    string
-	wg       sync.WaitGroup
-	subsMu   sync.Mutex
-	subs     map[net.Conn]struct{}
+	ln     net.Listener
+	daemon *Daemon
+	token  string
+	wg     sync.WaitGroup
+	subsMu sync.Mutex
+	subs   map[net.Conn]struct{}
 }
 
 // NewIPCServer starts the platform IPC listener.
@@ -346,7 +346,7 @@ func writeIPCFrame(w io.Writer, v any) error {
 		return fmt.Errorf("marshal ipc message: %w", err)
 	}
 	var buf [4]byte
-	binary.BigEndian.PutUint32(buf[:], uint32(len(data)))
+	binary.BigEndian.PutUint32(buf[:], uint32(len(data))) //nolint:gosec // G115: message size is always well below MaxUint32
 	if _, err := w.Write(buf[:]); err != nil {
 		return err
 	}

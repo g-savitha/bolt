@@ -19,3 +19,4 @@ deploy/*.local.*
 .idea/
 .vscode/
 *.swp
+golangci-lint

@@ -40,7 +40,7 @@ func spawnDaemon(configDir string) error {
 		return fmt.Errorf("locate bolt executable: %w", err)
 	}
 
-	cmd := exec.Command(exe, "daemon", "--config-dir", configDir)
+	cmd := exec.Command(exe, "daemon", "--config-dir", configDir) //nolint:gosec // exe is resolved via os.Executable(), not user input
 	cmd.Stdin = nil
 	cmd.Stdout = nil
 	cmd.Stderr = nil
@@ -52,7 +52,7 @@ func spawnDaemon(configDir string) error {
 
 	pidPath := pidFilePath(configDir)
 	pidData := strconv.Itoa(cmd.Process.Pid) + "\n"
-	if err := os.WriteFile(pidPath, []byte(pidData), 0644); err != nil {
+	if err := os.WriteFile(pidPath, []byte(pidData), 0600); err != nil {
 		fmt.Fprintf(os.Stderr, "warning: could not write daemon pid file: %v\n", err)
 	}
 	_ = cmd.Process.Release()

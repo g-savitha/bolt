@@ -12,22 +12,25 @@ linters:
     - unused
     # style / readability
     - misspell
-    - gofmt
     - whitespace
 
   settings:
     gosec:
-      # Report everything; individual suppressions via //nolint:gosec with a reason.
       confidence: low
       severity: low
+      # G104 (unhandled errors) duplicates errcheck which we configure separately.
+      excludes: [G104]
 
     govet:
       enable-all: true
       disable:
-        - shadow  # too noisy for idiomatic Go
+        - shadow        # too noisy for idiomatic Go
+        - fieldalignment  # optimization hint, not a correctness issue
 
     errcheck:
       # Ignore errors from fmt.Print* family — acceptable in CLI output paths.
+      # Ignore deferred Close calls — the idiomatic Go pattern `defer x.Close()`
+      # intentionally discards the error; real close errors are caught elsewhere.
       exclude-functions:
         - fmt.Print
         - fmt.Println
@@ -35,21 +38,33 @@ linters:
         - fmt.Fprint
         - fmt.Fprintln
         - fmt.Fprintf
+        - (io.Closer).Close
+        - (*net.Conn).Close
       check-type-assertions: true
 
     staticcheck:
       checks: ["all"]
 
-issues:
-  exclude-rules:
-    # Test files get a relaxed security and error-check policy.
-    - path: "_test\\.go"
-      linters:
-        - gosec
-        - errcheck
+  # v2: per-path/linter exclusions live under linters.exclusions, not issues.
+  exclusions:
+    rules:
+      - path: "_test\\.go"
+        linters:
+          - gosec
+          - errcheck
+      # defer x.Close() / x.Close() in cleanup paths is idiomatic Go.
+      # The caller cannot meaningfully act on a close error in these positions.
+      - linters: [errcheck]
+        text: "Error return value of `.*\\.Close.*` is not checked"
 
+issues:
   max-issues-per-linter: 0
   max-same-issues: 0
+
+# In golangci-lint v2, formatters are separate from linters.
+formatters:
+  enable:
+    - gofmt
 
 run:
   timeout: 5m

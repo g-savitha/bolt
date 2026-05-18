@@ -67,7 +67,7 @@ func Randomart(pub ed25519.PublicKey) string {
 				y = height - 1
 			}
 
-			field[y][x]++
+			field[y][x]++ //nolint:gosec // G602: x and y are clamped to [0, width-1] and [0, height-1] above
 		}
 	}
 

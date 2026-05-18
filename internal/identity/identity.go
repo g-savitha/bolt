@@ -89,7 +89,7 @@ func Load(dir string) (*Identity, error) {
 	// Sanity check: the public key embedded in the private key must match
 	// the separately stored public key. If they differ, the files are corrupt
 	// or have been tampered with.
-	derivedPub := priv.Public().(ed25519.PublicKey)
+	derivedPub := priv.Public().(ed25519.PublicKey) //nolint:errcheck // type assertion is safe: ed25519.PrivateKey.Public() always returns ed25519.PublicKey
 	if string(derivedPub) != string(pub) {
 		return nil, errors.New("public key does not match private key — identity files may be corrupt")
 	}
@@ -216,15 +216,15 @@ func writePublicKey(path string, key ed25519.PublicKey) error {
 	}
 	data := pem.EncodeToMemory(block)
 
-	// 0644 — public key is safe to be world-readable.
-	if err := os.WriteFile(path, data, 0644); err != nil {
+	// 0644 — public key is intentionally world-readable (it's a public key).
+	if err := os.WriteFile(path, data, 0644); err != nil { //nolint:gosec // G306: public key file is safe to be world-readable
 		return fmt.Errorf("write public key to %s: %w", path, err)
 	}
 	return nil
 }
 
 func readPrivateKey(path string) (ed25519.PrivateKey, error) {
-	data, err := os.ReadFile(path)
+	data, err := os.ReadFile(path) //nolint:gosec // G304: path is derived from DefaultConfigDir(), not user input
 	if err != nil {
 		if os.IsNotExist(err) {
 			return nil, fmt.Errorf("private key not found at %s — run 'bolt init' first", path)
@@ -247,7 +247,7 @@ func readPrivateKey(path string) (ed25519.PrivateKey, error) {
 }
 
 func readPublicKey(path string) (ed25519.PublicKey, error) {
-	data, err := os.ReadFile(path)
+	data, err := os.ReadFile(path) //nolint:gosec // G304: path is derived from DefaultConfigDir(), not user input
 	if err != nil {
 		if os.IsNotExist(err) {
 			return nil, fmt.Errorf("public key not found at %s — run 'bolt init' first", path)

@@ -30,11 +30,6 @@ type PeerConn struct {
 	// These fields are set once during Handshake() and then read-only.
 	peerFingerprint string
 	peerNickname    string
-
-	// chatStream is the single persistent stream for chat messages.
-	// Opened lazily on first chat send.
-	chatStreamMu sync.Mutex
-	chatStream   *quic.Stream
 }
 
 // Handshake performs the bolt application-level identity verification after

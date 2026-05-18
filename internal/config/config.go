@@ -180,7 +180,7 @@ func write(path string, cfg *Config) error {
 		return fmt.Errorf("create config directory: %w", err)
 	}
 
-	f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+	f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644) //nolint:gosec // G304: path is derived from DefaultConfigDir(), not user input
 	if err != nil {
 		return fmt.Errorf("open config file for writing: %w", err)
 	}

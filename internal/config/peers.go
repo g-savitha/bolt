@@ -85,7 +85,7 @@ func LoadPeerStore(dir string) (*PeerStore, error) {
 		peers: make(map[string]*PeerRecord),
 	}
 
-	data, err := os.ReadFile(path)
+	data, err := os.ReadFile(path) //nolint:gosec // G304: path is derived from DefaultConfigDir(), not user input
 	if os.IsNotExist(err) {
 		// No peers file yet — that's fine, we'll create it on first write.
 		return store, nil
@@ -204,7 +204,7 @@ func (s *PeerStore) flushLocked() error {
 		return fmt.Errorf("create config directory: %w", err)
 	}
 
-	f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+	f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644) //nolint:gosec // G304: path is derived from DefaultConfigDir(), not user input
 	if err != nil {
 		return fmt.Errorf("open peers file for writing: %w", err)
 	}

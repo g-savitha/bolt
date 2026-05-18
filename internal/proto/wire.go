@@ -162,7 +162,7 @@ func WriteFrame(w io.Writer, msg any) error {
 	}
 
 	var lengthBuf [4]byte
-	binary.BigEndian.PutUint32(lengthBuf[:], uint32(len(data)))
+	binary.BigEndian.PutUint32(lengthBuf[:], uint32(len(data))) //nolint:gosec // G115: guarded by maxFrameSize check above
 
 	if _, err := w.Write(lengthBuf[:]); err != nil {
 		return fmt.Errorf("write frame length: %w", err)

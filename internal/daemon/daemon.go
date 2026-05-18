@@ -139,7 +139,7 @@ func (d *Daemon) handleIncomingPeer(ctx context.Context, conn *quic.Conn) {
 	pc, err := d.authenticateIncoming(ctx, conn)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "authentication failed: %v\n", err)
-		conn.CloseWithError(1, "authentication failed")
+		_ = conn.CloseWithError(1, "authentication failed")
 		return
 	}
 

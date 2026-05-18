@@ -29,10 +29,10 @@ const (
 // Keeping this in one place ensures both sides use identical settings.
 func quicConfig() *quic.Config {
 	return &quic.Config{
-		KeepAlivePeriod:      keepAlivePeriod,
+		KeepAlivePeriod:       keepAlivePeriod,
 		MaxIncomingStreams:    maxIncomingStreams,
 		MaxIncomingUniStreams: maxIncomingStreams,
-		HandshakeIdleTimeout: handshakeTimeout,
+		HandshakeIdleTimeout:  handshakeTimeout,
 	}
 }
 

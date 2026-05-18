@@ -16,7 +16,7 @@ const ipcTokenFile = "ipc.token"
 func loadOrCreateIPCToken(configDir string) (string, error) {
 	path := filepath.Join(configDir, ipcTokenFile)
 
-	data, err := os.ReadFile(path)
+	data, err := os.ReadFile(path) //nolint:gosec // G304: path is derived from configDir (trusted, controlled by the daemon)
 	if err == nil {
 		token := string(data)
 		if len(token) >= 16 {
@@ -44,7 +44,7 @@ func loadOrCreateIPCToken(configDir string) (string, error) {
 // readIPCToken loads the token written by the daemon. Used by CLI clients.
 func readIPCToken(configDir string) (string, error) {
 	path := filepath.Join(configDir, ipcTokenFile)
-	data, err := os.ReadFile(path)
+	data, err := os.ReadFile(path) //nolint:gosec // G304: path is derived from configDir (trusted, controlled by the daemon)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return "", fmt.Errorf(

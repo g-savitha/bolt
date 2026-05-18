@@ -31,13 +31,13 @@ func (d *Daemon) ConnectPeer(ctx context.Context, address string) error {
 
 	tlsState := conn.ConnectionState().TLS
 	if len(tlsState.PeerCertificates) == 0 {
-		conn.CloseWithError(1, "no peer certificate")
+		_ = conn.CloseWithError(1, "no peer certificate")
 		return fmt.Errorf("peer at %s presented no TLS certificate", addr)
 	}
 
 	peerPub, err := identity.ExtractPublicKeyFromCert(tlsState.PeerCertificates[0])
 	if err != nil {
-		conn.CloseWithError(1, "bad certificate")
+		_ = conn.CloseWithError(1, "bad certificate")
 		return fmt.Errorf("read peer identity: %w", err)
 	}
 
@@ -45,7 +45,7 @@ func (d *Daemon) ConnectPeer(ctx context.Context, address string) error {
 	pc := transport.NewPeerConn(conn, fingerprint)
 
 	if err := pc.Handshake(ctx, d.localPeer()); err != nil {
-		conn.CloseWithError(1, "handshake failed")
+		_ = conn.CloseWithError(1, "handshake failed")
 		return fmt.Errorf("handshake with %s: %w", addr, err)
 	}
 
