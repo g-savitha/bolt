@@ -4,7 +4,7 @@ go 1.25.1
 
 require (
 	github.com/BurntSushi/toml v1.6.0
-	github.com/gofrs/flock v0.12.1
+	github.com/gofrs/flock v0.13.0
 	github.com/quic-go/quic-go v0.59.1
 	github.com/spf13/cobra v1.10.2
 )
