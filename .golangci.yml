@@ -53,3 +53,8 @@ issues:
 
 run:
   timeout: 5m
+  # Cap the Go version golangci-lint targets. golangci-lint 1.64 is built with
+  # Go 1.24 and refuses to run if go.mod declares a higher version. Linting
+  # behaviour is identical between 1.24 and 1.25; bump this when a new
+  # golangci-lint release ships with Go 1.25 support.
+  go: "1.24"
