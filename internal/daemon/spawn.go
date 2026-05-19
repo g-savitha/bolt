@@ -21,6 +21,24 @@ func pidFilePath(configDir string) string {
 	return filepath.Join(configDir, pidFile)
 }
 
+// writeDaemonPID records the running daemon PID after the listener is up.
+func writeDaemonPID(configDir string) error {
+	pidPath := pidFilePath(configDir)
+	if err := os.MkdirAll(configDir, 0700); err != nil {
+		return fmt.Errorf("create config directory: %w", err)
+	}
+	data := []byte(strconv.Itoa(os.Getpid()) + "\n")
+	return os.WriteFile(pidPath, data, 0600) //nolint:gosec // G306: path from config dir
+}
+
+func removeDaemonPID(configDir string) error {
+	err := os.Remove(pidFilePath(configDir))
+	if err != nil && !os.IsNotExist(err) {
+		return err
+	}
+	return nil
+}
+
 // EnsureRunning starts the daemon if it is not already listening.
 func EnsureRunning(configDir string) error {
 	if isDaemonReachable(configDir) {
@@ -48,12 +66,6 @@ func spawnDaemon(configDir string) error {
 
 	if err := cmd.Start(); err != nil {
 		return fmt.Errorf("start daemon process: %w", err)
-	}
-
-	pidPath := pidFilePath(configDir)
-	pidData := strconv.Itoa(cmd.Process.Pid) + "\n"
-	if err := os.WriteFile(pidPath, []byte(pidData), 0600); err != nil {
-		fmt.Fprintf(os.Stderr, "warning: could not write daemon pid file: %v\n", err)
 	}
 	_ = cmd.Process.Release()
 

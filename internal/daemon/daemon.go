@@ -77,6 +77,13 @@ func (d *Daemon) Run(ctx context.Context) error {
 		return fmt.Errorf("start peer listener: %w", err)
 	}
 
+	// daemon.pid is for operator/supervisor introspection; flock on the same
+	// path in spawn.go guards against double-spawn races.
+	if err := writeDaemonPID(d.configDir); err != nil {
+		return fmt.Errorf("write daemon pid file: %w", err)
+	}
+	defer func() { _ = removeDaemonPID(d.configDir) }()
+
 	fmt.Fprintf(os.Stderr, "bolt daemon running on UDP port %d\n", d.cfg.Port)
 
 	<-ctx.Done()
