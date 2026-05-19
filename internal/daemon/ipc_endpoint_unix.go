@@ -18,6 +18,14 @@ func SocketPath(configDir string) string {
 
 func listenIPC(configDir string) (net.Listener, error) {
 	socketPath := SocketPath(configDir)
+	if _, err := os.Stat(socketPath); err == nil {
+		if isDaemonReachable(configDir) {
+			return nil, fmt.Errorf(
+				"bolt daemon already running (socket %s is in use); stop it before starting another",
+				socketPath,
+			)
+		}
+	}
 	if err := os.Remove(socketPath); err != nil && !os.IsNotExist(err) {
 		return nil, fmt.Errorf("remove stale socket: %w", err)
 	}
