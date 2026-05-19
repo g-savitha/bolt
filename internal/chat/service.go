@@ -6,6 +6,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
+	"log"
 	"sync"
 	"time"
 
@@ -95,7 +96,11 @@ func (s *Service) AttachStream(ctx context.Context, pc *transport.PeerConn, stre
 			return
 		}
 		if msg.V != proto.WireVersion {
-			continue
+			log.Printf(
+				"chat: wire version mismatch from %s: got v=%d want v=%d — closing stream",
+				fp, msg.V, proto.WireVersion,
+			)
+			return
 		}
 		sentAt := msg.SentAt
 		if sentAt.IsZero() {
