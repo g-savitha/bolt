@@ -153,11 +153,18 @@ func (s *IPCServer) PublishChat(evt ChatEventPayload) {
 	}
 	event := IPCEvent{Type: "chat", Payload: data}
 	s.subsMu.Lock()
-	defer s.subsMu.Unlock()
+	conns := make([]net.Conn, 0, len(s.subs))
 	for conn := range s.subs {
+		conns = append(conns, conn)
+	}
+	s.subsMu.Unlock()
+
+	for _, conn := range conns {
 		if err := writeIPCFrame(conn, event); err != nil {
+			s.subsMu.Lock()
 			delete(s.subs, conn)
-			conn.Close()
+			s.subsMu.Unlock()
+			_ = conn.Close()
 		}
 	}
 }
