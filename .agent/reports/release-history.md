@@ -6,8 +6,9 @@ Maintained by: Release Manager (`/release-manager`)
 
 ## v0.1.2 — Bug fixes and security hardening
 **Date**: 2026-05-19
-**SHA**: ecb8683 (main)
+**SHA**: cb4f8a7 (main)
 **Tagged by**: Release Manager
+**GHA run**: https://github.com/g-savitha/bolt/actions/runs/26094684633 ✅
 **GitHub**: https://github.com/g-savitha/bolt/releases/tag/v0.1.2
 
 ### Included PRs

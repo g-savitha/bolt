@@ -43,24 +43,37 @@ gh run list --branch main --limit 3   # CI must be green on HEAD
 - Group into: Security / Bug fixes / Features / CI & tooling
 - Check `.agent/backlog/tasks.md` Done section for BOLT story context
 
-**Step 3 — Tag**:
+**Step 3 — Tag on the commit that contains the release workflow fix**:
+
+The tag commit determines which version of `.github/workflows/release.yml` goreleaser uses. Always tag on current `main` after any workflow changes are pushed.
+
 ```bash
+git checkout main && git pull origin main   # ensure workflow is up to date
 git tag -a v<MAJOR>.<MINOR>.<PATCH> -m "$(cat <<'EOF'
 v<MAJOR>.<MINOR>.<PATCH> — <one-line summary>
 
 <full release notes grouped by category>
 EOF
-)"
+)" HEAD
 git push origin v<MAJOR>.<MINOR>.<PATCH>
 ```
 
-**Step 4 — GitHub release**:
+**Step 4 — Let goreleaser create the GitHub release** (do NOT use `gh release create`):
+
+Pushing the tag triggers `.github/workflows/release.yml`, which runs `goreleaser release --clean`. Goreleaser builds the cross-platform binaries, generates SBOMs, creates the GitHub release, and uploads all assets automatically.
+
+**Do not run `gh release create` manually.** If you create the release before goreleaser runs, goreleaser will still update it — but running both introduces a race and leaves the release in an inconsistent state until goreleaser finishes.
+
+Monitor the workflow:
 ```bash
-gh release create v<MAJOR>.<MINOR>.<PATCH> \
-  --title "v<MAJOR>.<MINOR>.<PATCH> — <summary>" \
-  --notes "<release notes>" \
-  --verify-tag
+gh run list --workflow=release.yml --limit 1
 ```
+
+Verify assets after goreleaser completes:
+```bash
+gh release view v<MAJOR>.<MINOR>.<PATCH> --json assets
+```
+Expected assets: `bolt_<ver>_<os>_<arch>.tar.gz` (or `.zip` for Windows), matching `.sbom` files, and `SHA256SUMS`.
 
 **Step 5 — Update release history**:
 Write to `.agent/reports/release-history.md` with tag, date, SHA, summary, and PR list.
