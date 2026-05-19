@@ -1,5 +1,52 @@
 # Messages for Staff Engineer
+---
+## 🚀 Released: v0.1.2 (from Release Manager)
 
+**Tag**: v0.1.2 | **Date**: 2026-05-19 | **SHA**: ecb8683
+**GitHub**: https://github.com/g-savitha/bolt/releases/tag/v0.1.2
+
+**What shipped**:
+- 🔒 Go 1.25.10 — closes 15 stdlib vulns (BOLT-024)
+- 🔒 TTY sanitization for peer strings (BOLT-025)
+- 🔒 Daemon env allowlist — shell secrets no longer inherited (BOLT-026)
+- 🐛 Atomic config writes — survives kill-9 (BOLT-003)
+- 🐛 Clean daemon shutdown on SIGTERM (BOLT-004)
+- 🐛 daemon.pid lifecycle fixed (BOLT-005)
+- 🐛 IPC socket chmod 0600, stale socket guard, chat version mismatch, PublishChat lock (BUG-6/7/8/10)
+- ✨ Pluggable stream-handler registry (BOLT-006 / BUG-9)
+
+**Still open** (deferred to Phase 2 by design):
+- BUG-1 (#23) — TOFU stub, fix is BOLT-001
+- BUG-4 (#26) — ChunkMsg base64, fix is BOLT-008
+
+**What's next**: Phase 2 Wave 2 — BOLT-010 (loopback harness) is the next pickup.
+
+
+## 2026-05-19 — Phase 2 GO/NO-GO discussion (from Manager, Savvy directive)
+
+Savvy wants the full team aligned before Phase 2 starts. Your part:
+
+1. **Wave 1 + Tier A code quality**: You joined after Wave 1 merged without a review gate. Do a targeted audit of the merged PRs (#37–#47). Are there any code-quality issues that are risky enough to fix before v0.1 tags? Flag anything that would embarrass us when open-sourced.
+2. **BOLT-010 (loopback harness) readiness**: This is the next pickup. Review the acceptance criteria at `tasks.md` BOLT-010 and confirm there are no design questions that Backend needs answered before starting. If there are, resolve them now.
+3. **BOLT-009 (IPC layering) — design pre-work**: This story is a precondition for BOLT-001 and BOLT-013. Can you draft the target package structure (what moves where) before Backend picks it up, so the PR is a clean mechanical refactor rather than a design session?
+4. **Phase 2 risk**: From a code-quality lens, what's the highest-risk thing we're carrying into Phase 2? (Concurrency, error handling, interface boundary, test coverage gap?)
+
+Discuss with Architect (A-1 Transport interface gap, A-2 IPC layering). Write your verdict to `.agent/messages/manager.md`.
+
+---
+## 2026-05-19 — QA re-verification results (from QA)
+
+Wave 1 + Tier A verified on main `7db38e4`. Summary for your awareness:
+
+**All closed** ✅: BUG-6 (#28), BUG-7 (#29), BUG-8 (#30), BUG-9 (#31 / BOLT-006 #12), BUG-10 (#32). Source-level verification confirms fixes are correct. Race detector clean.
+
+**Still open — requires Phase 2 implementation**:
+- **BUG-1 (#23)** — `connect.go:81` TOFU stub: `return true, nil` for all peers. Needs BOLT-001 + BOLT-010.
+- **BUG-4 (#26)** — `wire.go:124` `ChunkMsg.Data []byte` base64 encodes to JSON. Needs BOLT-008.
+
+**Your action**: When backend opens PRs for BOLT-010 (loopback harness), BOLT-001 (TOFU), and BOLT-008 (wire schema), please verify those PRs close BUG-1 and BUG-4 respectively — not just that the new AC passes, but that the specific file:line stubs cited above are gone. Both are security-sensitive paths.
+
+---
 ## 2026-05-19 — Welcome to the team (from Manager)
 
 Welcome to bolt. You are the Staff Software Engineer — the highest IC role on the team.

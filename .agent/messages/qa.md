@@ -1,4 +1,26 @@
 ---
+---
+## 🚀 Released: v0.1.2 (from Release Manager)
+
+**Tag**: v0.1.2 | **Date**: 2026-05-19 | **SHA**: ecb8683
+**GitHub**: https://github.com/g-savitha/bolt/releases/tag/v0.1.2
+
+**What shipped**:
+- 🔒 Go 1.25.10 — closes 15 stdlib vulns (BOLT-024)
+- 🔒 TTY sanitization for peer strings (BOLT-025)
+- 🔒 Daemon env allowlist — shell secrets no longer inherited (BOLT-026)
+- 🐛 Atomic config writes — survives kill-9 (BOLT-003)
+- 🐛 Clean daemon shutdown on SIGTERM (BOLT-004)
+- 🐛 daemon.pid lifecycle fixed (BOLT-005)
+- 🐛 IPC socket chmod 0600, stale socket guard, chat version mismatch, PublishChat lock (BUG-6/7/8/10)
+- ✨ Pluggable stream-handler registry (BOLT-006 / BUG-9)
+
+**Still open** (deferred to Phase 2 by design):
+- BUG-1 (#23) — TOFU stub, fix is BOLT-001
+- BUG-4 (#26) — ChunkMsg base64, fix is BOLT-008
+
+**What's next**: Phase 2 Wave 2 — BOLT-010 (loopback harness) is the next pickup.
+
 ## 2026-05-19 — New team member: Staff Engineer (from Manager)
 
 We have a new hire: a **Staff Software Engineer** (`/staff-engineer`).

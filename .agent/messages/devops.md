@@ -1,4 +1,38 @@
 ---
+---
+## 🚀 Released: v0.1.2 (from Release Manager)
+
+**Tag**: v0.1.2 | **Date**: 2026-05-19 | **SHA**: ecb8683
+**GitHub**: https://github.com/g-savitha/bolt/releases/tag/v0.1.2
+
+**What shipped**:
+- 🔒 Go 1.25.10 — closes 15 stdlib vulns (BOLT-024)
+- 🔒 TTY sanitization for peer strings (BOLT-025)
+- 🔒 Daemon env allowlist — shell secrets no longer inherited (BOLT-026)
+- 🐛 Atomic config writes — survives kill-9 (BOLT-003)
+- 🐛 Clean daemon shutdown on SIGTERM (BOLT-004)
+- 🐛 daemon.pid lifecycle fixed (BOLT-005)
+- 🐛 IPC socket chmod 0600, stale socket guard, chat version mismatch, PublishChat lock (BUG-6/7/8/10)
+- ✨ Pluggable stream-handler registry (BOLT-006 / BUG-9)
+
+**Still open** (deferred to Phase 2 by design):
+- BUG-1 (#23) — TOFU stub, fix is BOLT-001
+- BUG-4 (#26) — ChunkMsg base64, fix is BOLT-008
+
+**What's next**: Phase 2 Wave 2 — BOLT-010 (loopback harness) is the next pickup.
+
+## 2026-05-19 — Phase 2 GO/NO-GO discussion (from Manager, Savvy directive)
+
+Savvy wants to verify work locally before Phase 2 starts. Your part:
+
+1. **Local build verification**: Confirm `go build -o bolt ./cmd/bolt` produces a working binary on macOS. What's the exact sequence of commands Savvy should run to: build → init → start daemon → verify socket → run a chat → SIGTERM cleanly?
+2. **CI health**: Is the current CI (`ci.yml`) sufficient as a Phase 2 quality gate, or are there gaps that will cause issues as Phase 2 PRs land (e.g., no macOS matrix, no explicit `go build` step)?
+3. **v0.1 release**: If Savvy confirms the tag, what does `goreleaser` need before it can produce the v0.1 release artifacts? Are there any `goreleaser` config gaps?
+4. **BOLT-015** (full CI matrix): Is this a pre-Phase 2 requirement or can Phase 2 start with the current single-platform CI?
+
+Write your verdict and the local verification script to `.agent/messages/manager.md`.
+
+---
 ## 2026-05-19 — dependency-review re-enabled (Savvy)
 
 Savvy enabled **Dependency graph** (Settings → Security analysis). The `dependency-review` job in `.github/workflows/ci.yml` was uncommented on branch `ci/enable-dependency-review` (PR pending). Job runs on `pull_request` only (`if: github.event_name == 'pull_request'`), with job-level `contents: read` + `pull-requests: read` and pinned `actions/dependency-review-action@2031cfc080254a8a887f58cffee85186f0e49e48` (# v4).

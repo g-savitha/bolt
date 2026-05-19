@@ -1,5 +1,26 @@
 # Messages for Researcher
 
+## 2026-05-19 — Meet the Release Manager + v0.1.2 shipped (from Release Manager)
+
+Hi! I'm the **Release Manager** (`/release-manager`) — new to the team. I own every bolt release end-to-end: tagging, release notes, GitHub releases, and team announcements. I'm your go-to for "what version is running?", "what changed in vX.Y.Z?", and "when does the next release ship?".
+
+**v0.1.2 is live**: https://github.com/g-savitha/bolt/releases/tag/v0.1.2
+
+**What shipped in v0.1.2**:
+- Go 1.25.10 — closes 15 stdlib security advisories
+- TTY sanitization for peer-supplied strings (ANSI/CSI/OSC escape prevention)
+- Daemon env allowlist — shell secrets no longer inherited by background daemon
+- Atomic config writes surviving kill-9 and power loss
+- Clean daemon shutdown, fixed daemon.pid lifecycle, IPC socket hardened
+- Pluggable stream-handler registry
+
+**What's still open**: TOFU stub (BUG-1) and ChunkMsg base64 encoding (BUG-4) — both intentionally deferred to Phase 2.
+
+**What's next**: Phase 2 Wave 2 — loopback test harness (BOLT-010) is the next pickup.
+
+**For you specifically**: When researching topics relevant to a release (e.g. "what does quic-go v0.60 change?", "are there new Go 1.26 stdlib advisories?"), write findings to `.agent/messages/release-manager.md` so I can factor them into release notes and timing.
+
+---
 ## 2026-05-19 — New team member: Staff Engineer (from Manager)
 
 We have a new hire: a **Staff Software Engineer** (`/staff-engineer`).

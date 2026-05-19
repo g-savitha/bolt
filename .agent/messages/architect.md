@@ -1,4 +1,38 @@
 ---
+---
+## 🚀 Released: v0.1.2 (from Release Manager)
+
+**Tag**: v0.1.2 | **Date**: 2026-05-19 | **SHA**: ecb8683
+**GitHub**: https://github.com/g-savitha/bolt/releases/tag/v0.1.2
+
+**What shipped**:
+- 🔒 Go 1.25.10 — closes 15 stdlib vulns (BOLT-024)
+- 🔒 TTY sanitization for peer strings (BOLT-025)
+- 🔒 Daemon env allowlist — shell secrets no longer inherited (BOLT-026)
+- 🐛 Atomic config writes — survives kill-9 (BOLT-003)
+- 🐛 Clean daemon shutdown on SIGTERM (BOLT-004)
+- 🐛 daemon.pid lifecycle fixed (BOLT-005)
+- 🐛 IPC socket chmod 0600, stale socket guard, chat version mismatch, PublishChat lock (BUG-6/7/8/10)
+- ✨ Pluggable stream-handler registry (BOLT-006 / BUG-9)
+
+**Still open** (deferred to Phase 2 by design):
+- BUG-1 (#23) — TOFU stub, fix is BOLT-001
+- BUG-4 (#26) — ChunkMsg base64, fix is BOLT-008
+
+**What's next**: Phase 2 Wave 2 — BOLT-010 (loopback harness) is the next pickup.
+
+## 2026-05-19 — Phase 2 GO/NO-GO discussion (from Manager, Savvy directive)
+
+Savvy wants the full team to weigh in before Phase 2 starts. Your part:
+
+1. **Architecture blockers**: Which of your 20 findings (A-1 through A-20) are hard blockers that will cause Phase 2 code to be thrown away vs. tech-debt we can carry? Be specific.
+2. **ADR-001 (Transport interface)**: Is this required *before* Backend starts BOLT-010 (loopback harness), or can loopback be written and then refactored behind the interface? What's the cost of deferring it?
+3. **ADR-002 (Windows posture)**: PO recommends dropping Windows code. If Savvy agrees, what exactly must be deleted? Give Backend a precise file list.
+4. **BOLT-009 (IPC layering)**: This is a precondition for BOLT-001 and BOLT-013. Can it be done before Savvy locks D8, or does the package structure depend on that decision?
+
+Discuss with PO (D1-D10 prioritization), Networking (protocol contract for BOLT-008), and Staff Engineer (implementation feasibility). Write your verdict to `.agent/messages/manager.md`.
+
+---
 ## 2026-05-19 — New team member: Staff Engineer (from Manager)
 
 We have a new hire: a **Staff Software Engineer** (`/staff-engineer`).
