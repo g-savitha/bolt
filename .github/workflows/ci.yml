@@ -22,6 +22,11 @@ jobs:
           go-version-file: go.mod
           cache: true
 
+      - name: Verify go.mod and go.sum are tidy
+        run: |
+          go mod tidy
+          git diff --exit-code -- go.mod go.sum
+
       - name: Run tests with race detector and coverage
         run: go test -race -coverprofile=coverage.out -covermode=atomic ./...
 
@@ -82,19 +87,20 @@ jobs:
           output: trivy-results.sarif
 
       - name: Upload Trivy SARIF to GitHub Security tab
-        if: always()
+        if: always() && hashFiles('trivy-results.sarif') != ''
         uses: github/codeql-action/upload-sarif@9e0d7b8d25671d64c341c19c0152d693099fb5ba # v4.35.5
         with:
           sarif_file: trivy-results.sarif
 
-  # ── 4. Dependency review (blocks PRs adding vulnerable deps) ─────────────────
-  dependency-review:
-    name: dependency-review
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-      - uses: actions/dependency-review-action@2031cfc080254a8a887f58cffee85186f0e49e48 # v4
+  # ── 4. Dependency review ───────────────────────────────────────────────────────
+  # Re-enable when GitHub Dependency graph is on (Settings → Security → Dependency graph).
+  # dependency-review:
+  #   name: dependency-review
+  #   runs-on: ubuntu-latest
+  #   if: github.event_name == 'pull_request'
+  #   steps:
+  #     - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+  #     - uses: actions/dependency-review-action@2031cfc080254a8a887f58cffee85186f0e49e48 # v4
 
   # ── 5. SonarCloud ─────────────────────────────────────────────────────────────
   sonarcloud:
