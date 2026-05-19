@@ -106,10 +106,22 @@ func NewIPCServer(configDir string, d *Daemon) (*IPCServer, error) {
 	return s, nil
 }
 
-// Close stops the IPC server.
+// Close stops the IPC server and waits for all handlers to exit.
+// Active subscribe connections are closed first so handleSubscribe
+// unblocks from conn.Read (fixes shutdown hang when a CLI is attached).
 func (s *IPCServer) Close() {
 	s.ln.Close()
+	s.closeSubscriberConns()
 	s.wg.Wait()
+}
+
+func (s *IPCServer) closeSubscriberConns() {
+	s.subsMu.Lock()
+	defer s.subsMu.Unlock()
+	for conn := range s.subs {
+		_ = conn.Close()
+	}
+	s.subs = make(map[net.Conn]struct{})
 }
 
 // PublishChat delivers a chat event to all subscribed CLI clients.
