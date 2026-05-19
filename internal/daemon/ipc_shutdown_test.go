@@ -41,6 +41,21 @@ func TestIPCServerCloseWithActiveSubscriber(t *testing.T) {
 	}
 	defer subConn.Close()
 
+	// Wait until handleSubscribe registered the connection (race with Close).
+	deadline := time.Now().Add(2 * time.Second)
+	for {
+		srv.subsMu.Lock()
+		n := len(srv.subs)
+		srv.subsMu.Unlock()
+		if n > 0 {
+			break
+		}
+		if time.Now().After(deadline) {
+			t.Fatal("subscribe connection not registered on server")
+		}
+		time.Sleep(5 * time.Millisecond)
+	}
+
 	done := make(chan struct{})
 	go func() {
 		srv.Close()
