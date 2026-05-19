@@ -134,7 +134,7 @@ func (pc *PeerConn) validateHandshake(msg proto.HandshakeMsg) error {
 		)
 	}
 
-	pc.peerNickname = msg.Nickname
+	pc.peerNickname = proto.SanitizeDisplay(msg.Nickname, proto.MaxNicknameRunes)
 	return nil
 }
 

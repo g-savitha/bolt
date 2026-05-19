@@ -102,9 +102,9 @@ func (s *Service) AttachStream(ctx context.Context, pc *transport.PeerConn, stre
 			sentAt = time.Now().UTC()
 		}
 		s.emit(IncomingMessage{
-			From:        msg.From,
+			From:        proto.SanitizeDisplay(msg.From, proto.MaxNicknameRunes),
 			Fingerprint: fp,
-			Body:        msg.Body,
+			Body:        proto.SanitizeDisplay(msg.Body, proto.MaxChatBodyRunes),
 			SentAt:      sentAt,
 		})
 	}

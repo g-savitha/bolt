@@ -185,9 +185,10 @@ func (d *Daemon) servePeer(ctx context.Context, pc *transport.PeerConn) {
 	d.registry.Add(pc)
 	defer d.registry.Remove(fp)
 
-	fmt.Fprintf(os.Stderr, "peer connected: %s (%s)\n", pc.PeerNickname(), fp[:17]+"...")
+	nick := proto.SanitizeDisplay(pc.PeerNickname(), proto.MaxNicknameRunes)
+	fmt.Fprintf(os.Stderr, "peer connected: %s (%s)\n", nick, fp[:17]+"...")
 	d.serveStreams(ctx, pc)
-	fmt.Fprintf(os.Stderr, "peer disconnected: %s\n", pc.PeerNickname())
+	fmt.Fprintf(os.Stderr, "peer disconnected: %s\n", nick)
 }
 
 func (d *Daemon) serveStreams(ctx context.Context, pc *transport.PeerConn) {
@@ -207,7 +208,7 @@ func (d *Daemon) routeStream(ctx context.Context, pc *transport.PeerConn, stream
 	default:
 		stream.Close()
 		if streamType != proto.StreamHandshake {
-			fmt.Fprintf(os.Stderr, "unhandled stream 0x%02x from %s\n", streamType, pc.PeerNickname())
+			fmt.Fprintf(os.Stderr, "unhandled stream 0x%02x from %s\n", streamType, proto.SanitizeDisplay(pc.PeerNickname(), proto.MaxNicknameRunes))
 		}
 	}
 }
