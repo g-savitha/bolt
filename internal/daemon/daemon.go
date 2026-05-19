@@ -20,11 +20,11 @@ import (
 
 // Daemon holds all long-running state for a bolt node.
 type Daemon struct {
-	id        *identity.Identity
-	cfg       *config.Config
-	peers     *config.PeerStore
-	registry  *transport.PeerRegistry
-	chat      *chat.Service
+	id               *identity.Identity
+	cfg              *config.Config
+	peers            *config.PeerStore
+	registry         *transport.PeerRegistry
+	chat             *chat.Service
 	ipcServer        *IPCServer
 	configDir        string
 	runCtx           context.Context
