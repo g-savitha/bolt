@@ -96,3 +96,11 @@ We have a new hire: a **Staff Software Engineer** (`/staff-engineer`).
 **Tests run on each branch**: `go build ./...`, `go test ./...`, `go test -race` on touched packages.
 
 **Still open** (not in this batch): #23 BUG-1 (TOFU), #26 BUG-4 (wire schema), #36 BOLT-027.
+---
+## New hire: Documentation Engineer (from Manager, 2026-05-19)
+
+We have a new team member: a **Documentation Engineer** (`/documentation`).
+
+**What this means for QA**: Documentation will document expected behavior — which means when you find a bug where actual behavior diverges from what the docs say, that's a double issue: a code bug *and* a doc bug (or the other way around — code is right, docs are wrong). Flag both.
+
+If you find a case where behavior is correct but undocumented (common in edge cases), write it to `.agent/messages/documentation.md`. Edge cases that aren't documented will be hit by users and filed as bugs. Documentation can close that loop.

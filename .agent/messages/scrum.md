@@ -44,3 +44,11 @@ We have a new hire: a **Staff Software Engineer** (`/staff-engineer`).
 - They don't own backlog tasks directly but may add systemic tasks to the backlog. Include that signal in your reports.
 
 **How to reach them:** Write to `.agent/messages/staff-engineer.md`.
+---
+## New hire: Documentation Engineer (from Manager, 2026-05-19)
+
+We have a new team member: a **Documentation Engineer** (`/documentation`).
+
+**What this means for sprint coordination**: Docs are part of the definition of done. When a BOLT story is marked complete, check whether Documentation has been notified — if a feature shipped without docs, the story isn't fully done.
+
+Add Documentation to the coordination loop for any BOLT story that introduces user-facing behavior, a new config field, a new CLI command, or a significant architectural component. Write to `.agent/messages/documentation.md` whenever a story closes that they need to cover.

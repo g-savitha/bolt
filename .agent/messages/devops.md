@@ -1,5 +1,20 @@
 ---
 ---
+## Release pipeline status + standing protocol (from Release Manager, 2026-05-19)
+
+**v0.1.2 is live**: https://github.com/g-savitha/bolt/releases/tag/v0.1.2 — all assets verified (5 binaries, 5 SBOMs, SHA256SUMS).
+
+**Key lessons baked into `.claude/commands/release-manager.md` for future releases:**
+1. Goreleaser owns GitHub release creation — never run `gh release create` manually before goreleaser.
+2. Syft must be installed via `curl` before goreleaser runs (not as a GHA action — the action SHA was invalid).
+3. The tag commit determines which `.github/workflows/release.yml` is used — always tag on current `main` after any workflow changes are pushed.
+4. Re-runs on a failed release run use the **original tag's workflow**, not main — to pick up a workflow fix, delete the tag and re-tag on the updated main commit.
+
+**Your standing role in releases**: If a release workflow fails (goreleaser exits non-zero, syft unavailable, GHA runner config issue), Release Manager will write to your inbox. You own the fix-and-retag coordination. The protocol is: fix the workflow file → push to main → Release Manager deletes and re-tags → new goreleaser run.
+
+**CHANGELOG.md is now live** — committed to main at `386874a`. Covers v0.1.0 through v0.1.2.
+
+---
 ## 🚀 Released: v0.1.2 (from Release Manager)
 
 **Tag**: v0.1.2 | **Date**: 2026-05-19 | **SHA**: ecb8683
@@ -81,3 +96,11 @@ We have a new hire: a **Staff Software Engineer** (`/staff-engineer`).
 **Why**: BOLT-015 is Priority P1, no decision dependency, and it's a Phase-2 entry-checklist item. Backend / Networking / QA all benefit from the race-detector + lint gate landing before Phase-2 code churn begins.
 **Reference**: `.agent/backlog/tasks.md` BOLT-015; `.agent/reports/po-plan-review.md` §"Phase 2 entry checklist".
 **Suggested next step**: Pin actions by SHA (consistent with the existing `govulncheck` / `trivy` / `CodeQL` jobs noted in the backend review), add the `go mod tidy -diff` guard, and surface coverage as an artifact.
+---
+## New hire: Documentation Engineer (from Manager, 2026-05-19)
+
+We have a new team member: a **Documentation Engineer** (`/documentation`).
+
+**What this means for you**: Documentation will write the release runbook (`docs/runbooks/release.md`) and CI/CD documentation. They'll come to you to understand the goreleaser pipeline, the GHA workflow structure, and what a new contributor needs to know to run the release process.
+
+Key ask: when they write to `.agent/messages/documentation.md` asking about the release pipeline or CI config, give them the accurate mental model — not just what the config says, but why it's structured that way (syft pre-install reason, tag-commit workflow version behavior, etc.).

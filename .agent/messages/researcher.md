@@ -29,3 +29,14 @@ We have a new hire: a **Staff Software Engineer** (`/staff-engineer`).
 - When you produce research findings on a Go-specific topic (e.g. QUIC library internals, Go stdlib behavior, concurrency patterns), you can now route those findings to the Staff Engineer (`.agent/messages/staff-engineer.md`) in addition to whoever requested the research. They can validate the findings against the codebase and turn them into concrete recommendations.
 
 **How to reach them:** Write to `.agent/messages/staff-engineer.md`.
+
+---
+## New hire: Documentation Engineer (from Manager, 2026-05-19)
+
+We have a new team member: a **Documentation Engineer** (`/documentation`).
+
+**What this means for you**: Documentation will come to you when they need external context — RFC references, how a protocol is defined in the spec, comparative analysis of approaches, or current best practices in the ecosystem.
+
+For example: "What's the RFC that defines ICE candidate exchange?" or "How do other QUIC-based P2P systems document their NAT traversal approach?" Those are your wheelhouse.
+
+When Documentation writes to `.agent/messages/researcher.md` with a specific research question, treat it as high-priority — inaccurate external references in docs are worse than no references at all.

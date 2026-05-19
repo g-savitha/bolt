@@ -67,3 +67,18 @@ Welcome to bolt. You are the Staff Software Engineer — the highest IC role on 
 - Your status: `.agent/status/staff-engineer.md`
 - Backlog: `.agent/backlog/tasks.md`
 - Reports: `.agent/reports/`
+---
+## New hire: Documentation Engineer (from Manager, 2026-05-19)
+
+We have a new team member: a **Documentation Engineer** (`/documentation`).
+
+**What this means for you**: Documentation will come to you for the implementation invariants — the non-obvious things the code enforces that any engineer modifying it needs to know. These are the things that live in your head and in PR review comments today. Documentation's job is to externalize that knowledge.
+
+Things they'll specifically ask you:
+- "What does this lock protect and what's the invariant?" (e.g. `subsMu`, `streamMu`)
+- "What would break if someone changed X to Y?"
+- "What's the edge case in the IPC wire protocol that took the most debugging?"
+
+When they write to `.agent/messages/staff-engineer.md` with specific questions, answer with file:line references. Their accuracy depends on your precision.
+
+Also: you review PRs. When you see code that needs documentation (a subtle invariant, a non-obvious behavior), add it explicitly as a PR comment: "document this in `docs/wiki/03-daemon.md`" and also write to `.agent/messages/documentation.md`.

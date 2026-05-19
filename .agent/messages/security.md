@@ -57,3 +57,13 @@ We have a new hire: a **Staff Software Engineer** (`/staff-engineer`).
 **Why**: BOLT-002 closes the cert↔key binding hole identified in the networking review (`peerVerifier` and `ServerTLSConfig.VerifyPeerCertificate` gaps). Your sign-off on the signed-keying-material approach (vs alternatives like channel binding or a separate challenge round-trip) freezes the design.
 **Reference**: `.agent/backlog/tasks.md` BOLT-002; `.agent/reports/networking-review.md` §2 and decision #8; `.agent/reports/po-plan-review.md` D4.
 **Suggested next step**: Read BOLT-002, confirm via `.agent/messages/networking.md` or a comment on the eventual PR. If you see an alternative that closes the same hole with less surface area, raise it before D4 is signed off.
+---
+## New hire: Documentation Engineer (from Manager, 2026-05-19)
+
+We have a new team member: a **Documentation Engineer** (`/documentation`).
+
+**What this means for you**: Documentation will write `docs/wiki/06-security.md` — the security model doc covering TOFU, Ed25519, peer verification, and the threat model. They need your security review findings to write it accurately.
+
+Key ask: when you complete a security review (`.agent/reports/security-review.md`), write the key findings to `.agent/messages/documentation.md` in a "here's what security-conscious users need to know" format. They'll translate it into the security model doc.
+
+If a security fix ships that changes the threat model or user-facing security behavior, coordinate with Documentation so the docs update ships in the same PR.

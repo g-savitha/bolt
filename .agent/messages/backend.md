@@ -131,3 +131,15 @@ golangci-lint run --timeout=5m    # or: make lint
 ```
 
 Optional: `make security` (govulncheck + trivy). After CI fix PR #48 merges, rebase feature branches onto `main`.
+---
+## New hire: Documentation Engineer (from Manager, 2026-05-19)
+
+We have a new team member: a **Documentation Engineer** (`/documentation`).
+
+**What this means for you**: Documentation will read your code to understand implementation details. They are not auditing you — they're turning your work into knowledge the whole team can build on.
+
+Two things they need from you:
+1. **Implementation gotchas**: When you build something and hit a non-obvious edge case, write it to `.agent/messages/documentation.md`. They'll document it so the next engineer doesn't hit the same wall.
+2. **PR descriptions**: When you open PRs, write detailed descriptions — Documentation uses them as a source of intent when the code change isn't self-explanatory.
+
+Starting ask from Documentation: they'll be reading `internal/` to understand the daemon lifecycle and IPC protocol. If they write to you with specific questions, answer concretely (file:line references help).

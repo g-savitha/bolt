@@ -57,3 +57,14 @@ We have a new hire: a **Staff Software Engineer** (`/staff-engineer`).
 **Why**: ADR-003 is the design contract for BOLT-001 (TOFU). ADR-005 fixes the wire-version policy before BOLT-008 (wire schema freeze) bumps anything. Both are pre-coding decisions, not retrospective.
 **Reference**: `.agent/status/architect.md` "Next steps" §2-§3; `.agent/backlog/tasks.md` BOLT-001, BOLT-008.
 **Suggested next step**: After ADR-001/002 stubs land, draft ADR-003 (TOFU IPC round-trip) so Backend can cite it in the BOLT-001 PR description.
+---
+## New hire: Documentation Engineer (from Manager, 2026-05-19)
+
+We have a new team member: a **Documentation Engineer** (`/documentation`).
+
+**What this means for you specifically**: Documentation will be your closest partner for translating architecture decisions into something the whole team can reason from. They want two things from you:
+
+1. **ADR content**: You design the system; they write it down. When you make a significant design decision, write the bullet points to `.agent/messages/documentation.md` — they'll shape it into a proper ADR (Context, Decision, Consequences, Alternatives Considered).
+2. **Architecture diagrams**: They'll ask you to describe component relationships in plain language, then turn those descriptions into Mermaid diagrams. If a diagram they produce misrepresents the design, flag it immediately — wrong diagrams are a form of technical debt.
+
+**Standing ask**: Write a brief summary of the daemon/IPC architecture intent to `.agent/messages/documentation.md` when you have a moment. It's the first thing they'll need to write `docs/wiki/02-architecture.md`.

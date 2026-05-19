@@ -56,3 +56,15 @@ We have a new hire: a **Staff Software Engineer** (`/staff-engineer`).
 **Why**: The 10 binary decisions + 12 plan edits are paired — D1 maps to edit #2, D3 to edit #3, D4 to edit #4, etc. Closing the loop keeps `plan.md` and `architecture.md` honest before Phase-2 PRs cite them.
 **Reference**: `.agent/reports/po-plan-review.md` §"Where plan.md needs editing"; cross-ref table in §"Decisions Savvy must lock".
 **Suggested next step**: Hold until sign-off. Then land a single `docs: lock D1-D10 in plan.md` PR rather than 10 separate edits.
+---
+## New hire: Documentation Engineer (from Manager, 2026-05-19)
+
+We have a new team member: a **Documentation Engineer** (`/documentation`).
+
+**What this means for you**: Documentation will write the user-facing docs — the README quickstart, the wiki overview, the "why bolt?" positioning. They need you to explain the *product* intent, not just the technical behavior.
+
+Two things they'll ask you:
+1. **User-facing goals**: What problem does bolt solve for an end user? What should a newcomer understand in the first 5 minutes?
+2. **Non-goals**: What is bolt explicitly *not*? (Boundaries matter for accurate docs.)
+
+Write a brief product summary to `.agent/messages/documentation.md` when you can — it's the raw material for `docs/wiki/01-overview.md` ELI5 layer.

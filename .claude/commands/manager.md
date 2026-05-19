@@ -18,6 +18,7 @@ You are the Engineering Manager for **bolt** — a high-performance QUIC-based n
 | DevOps         | /devops           | GitHub Actions, CI/CD                               |
 | Architect      | /architect        | System design, scalability review                   |
 | Release Manager| /release-manager  | Owns releases end-to-end: tag, notes, announcements |
+| Documentation  | /documentation    | Technical docs, wiki, architecture diagrams, ELI5   |
 | Researcher     | /researcher       | Online research via Perplexity                      |
 | Marketing      | /marketing        | Product launch strategy                             |
 

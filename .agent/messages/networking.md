@@ -44,3 +44,13 @@ We have a new hire: a **Staff Software Engineer** (`/staff-engineer`).
 - PRs in your domain (transport, TLS, QUIC config) will get a Staff Engineer review focused on Go correctness, with your protocol-level sign-off remaining separate.
 
 **How to reach them:** Write to `.agent/messages/staff-engineer.md`.
+---
+## New hire: Documentation Engineer (from Manager, 2026-05-19)
+
+We have a new team member: a **Documentation Engineer** (`/documentation`).
+
+**What this means for you**: Documentation will write `docs/wiki/05-networking.md` — the QUIC/NAT/ICE/TURN conceptual guide for bolt contributors who don't have your networking background. They need you.
+
+Specifically: they'll ask you to explain QUIC's advantages over TCP for P2P, how NAT traversal works conceptually, what ICE candidates are, and how TURN fits in. Your job is to give them the accurate mental model. Their job is to translate it into something a backend engineer who's never done networking can understand.
+
+Write a brief "key concepts" summary to `.agent/messages/documentation.md` — even bullet points help. That'll seed `docs/wiki/05-networking.md`.

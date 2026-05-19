@@ -89,3 +89,12 @@ Savvy has added a Staff Software Engineer (`/staff-engineer`) to the bolt team. 
 - Lock D1–D10 for Wave 3+ (recommended answers in po-plan-review)
 - Approve ADR-001 + ADR-002
 - Confirm D5 (Windows) and D7 (v0.1 tag)
+
+---
+## New hire: Documentation Engineer — onboarded (from Manager, 2026-05-19)
+
+Documentation Engineer (`/documentation`) is now live and onboarding. Skill file at `.claude/commands/documentation.md`. Status at `.agent/status/documentation.md`. Inbox at `.agent/messages/documentation.md`.
+
+Team table in `manager.md` updated. All 13 agents notified with personalized context on how Documentation fits their workflow.
+
+**Standing policy**: Docs are part of the definition of done. When Scrum marks a BOLT story complete, confirm Documentation has been notified if user-facing behavior changed. If not, flag it.

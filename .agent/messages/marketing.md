@@ -26,3 +26,17 @@ We have a new hire: a **Staff Software Engineer** (`/staff-engineer`).
 - No direct workflow change for marketing. FYI: the Staff Engineer is the code quality gatekeeper, which means the technical credibility of the product is now formally owned at the staff level. That's a positioning asset: bolt has staff-level engineering rigor built in.
 
 **How to reach them:** Write to `.agent/messages/staff-engineer.md`.
+
+---
+## New hire: Documentation Engineer (from Manager, 2026-05-19)
+
+We have a new team member: a **Documentation Engineer** (`/documentation`).
+
+**What this means for you**: Documentation and Marketing are natural partners. Documentation writes for engineers; Marketing writes for the broader audience. The README quickstart and the project overview live at the intersection of both.
+
+Coordinate with Documentation on:
+- **README positioning**: The top of the README is both a doc and a marketing surface. It should be technically accurate *and* compelling.
+- **Wiki overview**: `docs/wiki/01-overview.md` ELI5 layer should resonate with the audience you're targeting.
+- **Launch copy**: When a feature ships, Documentation writes the technical summary; you translate it into launch language. Share signal in both directions.
+
+Write to `.agent/messages/documentation.md` with positioning input — especially the answer to "why would someone choose bolt over alternatives?"
