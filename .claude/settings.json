@@ -1,0 +1,31 @@
+{
+  "mcpServers": {
+    "perplexity": {
+      "command": "npx",
+      "args": ["-y", "mcp-perplexity"],
+      "env": {
+        "PERPLEXITY_API_KEY": "REPLACE_WITH_YOUR_KEY"
+      },
+      "disabled": true,
+      "_note": "Get a key at https://www.perplexity.ai/settings/api — set disabled:false and replace the key to activate /researcher with real web search"
+    }
+  },
+  "permissions": {
+    "allow": [
+      "Bash(go build *)",
+      "Bash(go test *)",
+      "Bash(go vet *)",
+      "Bash(go mod *)",
+      "Bash(golangci-lint *)",
+      "Bash(gh issue *)",
+      "Bash(gh pr *)",
+      "Bash(gh release *)",
+      "Bash(git log *)",
+      "Bash(git diff *)",
+      "Bash(git status)",
+      "Bash(git show *)",
+      "Bash(find . *)",
+      "Bash(grep *)"
+    ]
+  }
+}

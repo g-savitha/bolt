@@ -6,7 +6,7 @@ MAIN    := ./cmd/bolt
 
 LDFLAGS := -s -w -X github.com/bolt/bolt/internal/transport.BoltVersion=$(VERSION)
 
-.PHONY: build test lint security clean release-snapshot release-local install
+.PHONY: build test lint security pre-pr clean release-snapshot release-local install
 
 build:
 	go build -ldflags "$(LDFLAGS)" -o $(BINARY) $(MAIN)
@@ -25,6 +25,25 @@ lint:
 security:
 	govulncheck ./...
 	trivy fs . --severity HIGH,CRITICAL --exit-code 1
+
+# pre-pr: run the same checks GHA runs, locally, before opening a PR.
+# All steps must pass — same order as ci.yml so the first failure matches what CI would catch.
+# SonarCloud and Trivy SARIF upload are cloud-only; govulncheck covers vuln scanning locally.
+pre-pr:
+	@echo "── 1. go mod tidy check ──────────────────────────────────────────"
+	go mod tidy
+	git diff --exit-code -- go.mod go.sum
+	@echo "── 2. build ──────────────────────────────────────────────────────"
+	go build ./...
+	@echo "── 3. vet ────────────────────────────────────────────────────────"
+	go vet ./...
+	@echo "── 4. test (race + coverage) ─────────────────────────────────────"
+	go test -race -coverprofile=coverage.out -covermode=atomic ./...
+	@echo "── 5. lint ───────────────────────────────────────────────────────"
+	golangci-lint run --timeout=5m
+	@echo "── 6. govulncheck ────────────────────────────────────────────────"
+	govulncheck ./...
+	@echo "── pre-pr checks passed — safe to open PR ────────────────────────"
 
 clean:
 	rm -f $(BINARY) bolt.exe coverage.out
