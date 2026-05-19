@@ -25,11 +25,6 @@ func listenIPC(configDir string) (net.Listener, error) {
 	if err != nil {
 		return nil, fmt.Errorf("listen on unix socket %s: %w", socketPath, err)
 	}
-	if err := os.Chmod(socketPath, 0600); err != nil {
-		_ = ln.Close()
-		_ = os.Remove(socketPath)
-		return nil, fmt.Errorf("chmod unix socket %s: %w", socketPath, err)
-	}
 	return ln, nil
 }
 
