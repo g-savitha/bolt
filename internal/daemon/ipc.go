@@ -7,6 +7,7 @@ import (
 	"io"
 	"net"
 	"sync"
+	"time"
 )
 
 // IPC commands — extend this set as features grow.
@@ -109,10 +110,30 @@ func NewIPCServer(configDir string, d *Daemon) (*IPCServer, error) {
 // Close stops the IPC server and waits for all handlers to exit.
 // Active subscribe connections are closed first so handleSubscribe
 // unblocks from conn.Read (fixes shutdown hang when a CLI is attached).
+// Subscribers may still be registering when Close runs; poll close until
+// handlers exit (avoids race with Subscribe completing after the first pass).
 func (s *IPCServer) Close() {
 	s.ln.Close()
-	s.closeSubscriberConns()
-	s.wg.Wait()
+	done := make(chan struct{})
+	go func() {
+		s.wg.Wait()
+		close(done)
+	}()
+	ticker := time.NewTicker(10 * time.Millisecond)
+	defer ticker.Stop()
+	timeout := time.After(5 * time.Second)
+	for {
+		select {
+		case <-done:
+			return
+		case <-ticker.C:
+			s.closeSubscriberConns()
+		case <-timeout:
+			s.closeSubscriberConns()
+			<-done
+			return
+		}
+	}
 }
 
 func (s *IPCServer) closeSubscriberConns() {
