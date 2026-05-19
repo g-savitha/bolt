@@ -6,9 +6,20 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gofrs/flock"
+)
+
+// daemonEnvKeys lists environment variables the spawned daemon may inherit.
+// Adding a key is a deliberate security decision — review before extending.
+var (
+	daemonEnvAlways = []string{"PATH", "HOME", "USER", "LANG", "TZ", "TMPDIR"}
+	daemonEnvIfSet  = []string{
+		"BOLT_LOG", "BOLT_QLOG",
+		"XDG_CONFIG_HOME", "XDG_CACHE_HOME", "XDG_RUNTIME_DIR",
+	}
 )
 
 const (
@@ -41,6 +52,7 @@ func spawnDaemon(configDir string) error {
 	}
 
 	cmd := exec.Command(exe, "daemon", "--config-dir", configDir) //nolint:gosec // exe is resolved via os.Executable(), not user input
+	cmd.Env = daemonEnv(os.Environ())
 	cmd.Stdin = nil
 	cmd.Stdout = nil
 	cmd.Stderr = nil
@@ -68,6 +80,33 @@ func spawnDaemon(configDir string) error {
 		"daemon did not start within %s — try: bolt daemon",
 		spawnTimeout,
 	)
+}
+
+func daemonEnv(parent []string) []string {
+	lookup := envMap(parent)
+	var out []string
+	for _, key := range daemonEnvAlways {
+		if v, ok := lookup[key]; ok {
+			out = append(out, key+"="+v)
+		}
+	}
+	for _, key := range daemonEnvIfSet {
+		if v, ok := lookup[key]; ok && v != "" {
+			out = append(out, key+"="+v)
+		}
+	}
+	return out
+}
+
+func envMap(environ []string) map[string]string {
+	m := make(map[string]string, len(environ))
+	for _, entry := range environ {
+		key, val, ok := strings.Cut(entry, "=")
+		if ok {
+			m[key] = val
+		}
+	}
+	return m
 }
 
 func withPIDLock(configDir string, fn func() error) error {
