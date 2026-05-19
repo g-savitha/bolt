@@ -15,6 +15,7 @@ import (
 	"github.com/bolt/bolt/internal/config"
 	"github.com/bolt/bolt/internal/daemon"
 	"github.com/bolt/bolt/internal/identity"
+	"github.com/bolt/bolt/internal/proto"
 	"github.com/bolt/bolt/internal/transport"
 	"github.com/spf13/cobra"
 )
@@ -278,7 +279,9 @@ func readChatEvents(conn net.Conn) {
 		} else if t, err := time.Parse(time.RFC3339, ts); err == nil {
 			ts = t.Local().Format("15:04:05")
 		}
-		fmt.Printf("\n[%s] %s: %s\n> ", ts, payload.From, payload.Body)
+		from := proto.SanitizeDisplay(payload.From, proto.MaxNicknameRunes)
+		body := proto.SanitizeDisplay(payload.Body, proto.MaxChatBodyRunes)
+		fmt.Printf("\n[%s] %s: %s\n> ", ts, from, body)
 	}
 }
 
