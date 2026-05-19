@@ -44,6 +44,9 @@ const (
 	StreamControl StreamType = 0x04
 )
 
+// ErrCodeUnknownStreamType is the QUIC stream error for an unrecognized StreamType.
+const ErrCodeUnknownStreamType = 0x1000
+
 // --- Handshake ---
 
 // HandshakeMsg is the first message exchanged after a QUIC connection is

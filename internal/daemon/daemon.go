@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 	"time"
 
@@ -19,14 +20,16 @@ import (
 
 // Daemon holds all long-running state for a bolt node.
 type Daemon struct {
-	id        *identity.Identity
-	cfg       *config.Config
-	peers     *config.PeerStore
-	registry  *transport.PeerRegistry
-	chat      *chat.Service
-	ipcServer *IPCServer
-	configDir string
-	runCtx    context.Context
+	id               *identity.Identity
+	cfg              *config.Config
+	peers            *config.PeerStore
+	registry         *transport.PeerRegistry
+	chat             *chat.Service
+	ipcServer        *IPCServer
+	configDir        string
+	runCtx           context.Context
+	streamHandlers   map[proto.StreamType]StreamHandler
+	streamHandlersMu sync.RWMutex
 }
 
 // New creates a Daemon from an already-loaded identity and config.
@@ -61,6 +64,8 @@ func (d *Daemon) Run(ctx context.Context) error {
 	// cancelled on daemon shutdown, not just when an individual Send call ends.
 	d.chat = chat.NewService(ctx)
 	d.chat.OnMessage(d.onChatMessage)
+	d.RegisterStreamHandler(proto.StreamChat, d.chat.HandleIncomingStream)
+	d.RegisterStreamHandler(proto.StreamFile, handleStreamFileNotImplemented)
 
 	ipcServer, err := NewIPCServer(d.configDir, d)
 	if err != nil {
@@ -209,15 +214,15 @@ func (d *Daemon) serveStreams(ctx context.Context, pc *transport.PeerConn) {
 }
 
 func (d *Daemon) routeStream(ctx context.Context, pc *transport.PeerConn, stream *quic.Stream, streamType proto.StreamType) {
-	switch streamType {
-	case proto.StreamChat:
-		d.chat.HandleIncomingStream(ctx, pc, stream)
-	default:
-		stream.Close()
-		if streamType != proto.StreamHandshake {
-			fmt.Fprintf(os.Stderr, "unhandled stream 0x%02x from %s\n", streamType, proto.SanitizeDisplay(pc.PeerNickname(), proto.MaxNicknameRunes))
-		}
+	if streamType == proto.StreamHandshake {
+		_ = stream.Close()
+		return
 	}
+	if h, ok := d.streamHandler(streamType); ok {
+		h(ctx, pc, stream)
+		return
+	}
+	d.rejectUnknownStream(pc, stream, streamType)
 }
 
 func (d *Daemon) shutdown() {
