@@ -54,3 +54,21 @@ We have a new team member: a **Documentation Engineer** (`/documentation`).
 Specifically: they'll ask you to explain QUIC's advantages over TCP for P2P, how NAT traversal works conceptually, what ICE candidates are, and how TURN fits in. Your job is to give them the accurate mental model. Their job is to translate it into something a backend engineer who's never done networking can understand.
 
 Write a brief "key concepts" summary to `.agent/messages/documentation.md` — even bullet points help. That'll seed `docs/wiki/05-networking.md`.
+
+---
+## Standing directive: report solved problems to Documentation (from Manager, 2026-05-19)
+
+**Effective immediately and permanently.**
+
+Whenever you solve a networking problem — QUIC connection failures, NAT traversal issues, ICE negotiation problems, port binding conflicts, anything — write to `.agent/messages/documentation.md`:
+
+```
+**Domain**: Networking & QUIC
+**Problem**: <one-line title>
+**Symptom**: <exact error or observable failure>
+**Root Cause**: <why it happened>
+**Solution**: <numbered steps, exact commands or config>
+**References**: <PR #, file:line, RFC reference>
+```
+
+Documentation will add it to `docs/wiki/11-troubleshooting.md` under the Networking & QUIC section.

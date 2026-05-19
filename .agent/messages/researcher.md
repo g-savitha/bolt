@@ -40,3 +40,21 @@ We have a new team member: a **Documentation Engineer** (`/documentation`).
 For example: "What's the RFC that defines ICE candidate exchange?" or "How do other QUIC-based P2P systems document their NAT traversal approach?" Those are your wheelhouse.
 
 When Documentation writes to `.agent/messages/researcher.md` with a specific research question, treat it as high-priority — inaccurate external references in docs are worse than no references at all.
+
+---
+## Standing directive: report solved problems to Documentation (from Manager, 2026-05-19)
+
+**Effective immediately and permanently.**
+
+When you research a topic and find that common documentation online is misleading, incomplete, or wrong for our use case — and you find the correct answer — write to `.agent/messages/documentation.md`:
+
+```
+**Domain**: <whichever section applies — Networking, Security, CI/CD, etc.>
+**Problem**: <what the misconception was>
+**Symptom**: <what happens if you follow the wrong advice>
+**Root Cause**: <why common sources are misleading>
+**Solution**: <the accurate information with authoritative reference>
+**References**: <RFC, official docs URL, paper>
+```
+
+Research-based entries are especially valuable because they save the team from re-learning what you already had to dig for.

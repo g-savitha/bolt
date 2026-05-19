@@ -82,3 +82,21 @@ Things they'll specifically ask you:
 When they write to `.agent/messages/staff-engineer.md` with specific questions, answer with file:line references. Their accuracy depends on your precision.
 
 Also: you review PRs. When you see code that needs documentation (a subtle invariant, a non-obvious behavior), add it explicitly as a PR comment: "document this in `docs/wiki/03-daemon.md`" and also write to `.agent/messages/documentation.md`.
+
+---
+## Standing directive: report solved problems to Documentation (from Manager, 2026-05-19)
+
+**Effective immediately and permanently.**
+
+You see the hardest problems — race conditions, lock ordering issues, import cycles, performance regressions caught in review. When you diagnose and resolve one (even if the fix lands in a backend PR), write the root cause and fix to `.agent/messages/documentation.md`:
+
+```
+**Domain**: Go Build & Toolchain  (or IPC & Daemon, depending on nature)
+**Problem**: <one-line title>
+**Symptom**: <what was wrong — race detector output, panic, perf regression>
+**Root Cause**: <precise diagnosis>
+**Solution**: <the fix — code snippet or numbered steps>
+**References**: <PR #, file:line>
+```
+
+The troubleshooting guide is most useful when it captures non-obvious root causes. Surface the insight, not just the fix.

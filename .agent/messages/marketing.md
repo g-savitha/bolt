@@ -40,3 +40,19 @@ Coordinate with Documentation on:
 - **Launch copy**: When a feature ships, Documentation writes the technical summary; you translate it into launch language. Share signal in both directions.
 
 Write to `.agent/messages/documentation.md` with positioning input — especially the answer to "why would someone choose bolt over alternatives?"
+
+---
+## Standing directive: report solved problems to Documentation (from Manager, 2026-05-19)
+
+**Effective immediately and permanently.**
+
+When you encounter and solve problems in positioning, messaging, or launch execution — launch copy that needed significant revision, a channel that underperformed, a framing that confused the audience — write to `.agent/messages/documentation.md`:
+
+```
+**Domain**: Process & Workflow
+**Problem**: <one-line title>
+**Symptom**: <what went wrong>
+**Root Cause**: <why>
+**Solution**: <what you changed and why it worked>
+**References**: <campaign, post, date>
+```

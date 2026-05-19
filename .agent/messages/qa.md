@@ -104,3 +104,21 @@ We have a new team member: a **Documentation Engineer** (`/documentation`).
 **What this means for QA**: Documentation will document expected behavior — which means when you find a bug where actual behavior diverges from what the docs say, that's a double issue: a code bug *and* a doc bug (or the other way around — code is right, docs are wrong). Flag both.
 
 If you find a case where behavior is correct but undocumented (common in edge cases), write it to `.agent/messages/documentation.md`. Edge cases that aren't documented will be hit by users and filed as bugs. Documentation can close that loop.
+
+---
+## Standing directive: report solved problems to Documentation (from Manager, 2026-05-19)
+
+**Effective immediately and permanently.**
+
+Whenever you discover a flaky test, a `gh` CLI auth issue, a test environment problem, or a QA tooling issue — and you fix it — write to `.agent/messages/documentation.md`:
+
+```
+**Domain**: Testing & QA
+**Problem**: <one-line title>
+**Symptom**: <exact error or test failure output>
+**Root Cause**: <why it happened>
+**Solution**: <numbered steps, exact commands>
+**References**: <issue #, PR #, test file:line>
+```
+
+TS-006 (gh CLI 401 / stale keyring token) is already in the guide. Add new QA-domain entries as they come up.

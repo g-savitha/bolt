@@ -45,6 +45,7 @@ docs/
     08-streams.md           — Stream-handler registry, chat stream lifecycle
     09-development.md       — Local setup, make targets, pre-pr gate, test patterns
     10-release.md           — Release process, goreleaser, versioning policy
+    11-troubleshooting.md   — Domain-indexed problem/solution guide (living document)
   adr/
     001-quic-transport.md   — Why QUIC over TCP/UDP raw
     002-unix-ipc-socket.md  — Why Unix domain socket for IPC
@@ -193,6 +194,81 @@ Before marking a doc done:
 - [ ] Links to related docs/ADRs are present
 - [ ] Renders correctly as GitHub Markdown (check Mermaid syntax)
 - [ ] No stale references to renamed packages, old APIs, or deleted config fields
+
+## Troubleshooting Guide (`docs/wiki/11-troubleshooting.md`)
+
+This is a **living document**. Every agent on the team has a standing directive to report problems they solve to your inbox. Your job is to take each report and add a structured entry to the troubleshooting guide.
+
+### Intake format (what agents send you)
+
+When an agent writes to `.agent/messages/documentation.md` with a solved problem, expect this shape:
+
+```
+**Domain**: <DevOps / Backend / Networking / Release / Security / QA / etc.>
+**Problem**: <one-line description of what went wrong>
+**Symptom**: <what the agent saw — error message, failing test, unexpected output>
+**Root Cause**: <why it happened>
+**Solution**: <what fixed it — specific commands, config changes, code edits>
+**References**: <PR numbers, file paths, GitHub issue links>
+```
+
+### What you do with it
+
+1. Read the incoming report from `.agent/messages/documentation.md`.
+2. Identify the domain section in `docs/wiki/11-troubleshooting.md`.
+3. Add a new entry under that section using the Troubleshooting Entry Format below.
+4. Verify accuracy: if the solution references a file or command, check it exists.
+5. Link to related wiki pages, ADRs, or runbooks where relevant.
+6. Acknowledge receipt by writing back to the reporting agent's inbox.
+
+### Troubleshooting Entry Format
+
+```markdown
+### [TS-NNN] <Problem title> — <Domain>
+**Reported by**: <Agent> | **Date**: YYYY-MM-DD | **Version**: vX.Y.Z (if applicable)
+
+**Symptom**
+<Exact error message or observable failure. Quote verbatim where possible.>
+
+**Root Cause**
+<Why this happens. One paragraph maximum. Be precise — vague root causes don't help.>
+
+**Solution**
+<Step-by-step fix. Number the steps. Include exact commands.>
+
+```bash
+# exact command that fixes it
+```
+
+**Prevention**
+<How to avoid this in future. If a process change was made, say so.>
+
+**See Also**
+- [Related wiki page](link)
+- PR #NNN / Issue #NNN
+```
+
+### Section structure of `11-troubleshooting.md`
+
+```
+## CI/CD & Release (DevOps, Release Manager)
+## Go Build & Toolchain (Backend, Staff Engineer)
+## Networking & QUIC (Networking)
+## Security (Security)
+## IPC & Daemon (Backend, Architect)
+## Testing & QA (QA)
+## Process & Workflow (Scrum, Manager, PO)
+```
+
+New domains can be added as needed — do not force-fit entries into the wrong section.
+
+### Entry numbering
+
+Entries are numbered globally: TS-001, TS-002, ... regardless of domain section. The number is permanent — never renumber, never reuse.
+
+### Manager enforcement
+
+The Manager has a standing directive to ensure every agent reports solved problems to Documentation. If an agent resolves a non-trivial problem and you see no corresponding troubleshooting entry within a sprint, flag it to the Manager.
 
 ## Coordination Protocol
 

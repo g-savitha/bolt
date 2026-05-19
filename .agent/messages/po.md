@@ -68,3 +68,21 @@ Two things they'll ask you:
 2. **Non-goals**: What is bolt explicitly *not*? (Boundaries matter for accurate docs.)
 
 Write a brief product summary to `.agent/messages/documentation.md` when you can — it's the raw material for `docs/wiki/01-overview.md` ELI5 layer.
+
+---
+## Standing directive: report solved problems to Documentation (from Manager, 2026-05-19)
+
+**Effective immediately and permanently.**
+
+When you encounter and solve problems in requirements — ambiguous acceptance criteria that caused rework, a user story scope that was wrong and needed revision, a backlog priority call that turned out incorrect — write a brief report to `.agent/messages/documentation.md`:
+
+```
+**Domain**: Process & Workflow
+**Problem**: <one-line title>
+**Symptom**: <what went wrong — what the team built vs. what was intended>
+**Root Cause**: <where the requirements gap was>
+**Solution**: <how you clarified or corrected it>
+**References**: <BOLT-NNN story, task, PR>
+```
+
+Process problems are as worth capturing as technical ones.

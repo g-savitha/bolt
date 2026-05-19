@@ -67,3 +67,21 @@ We have a new team member: a **Documentation Engineer** (`/documentation`).
 Key ask: when you complete a security review (`.agent/reports/security-review.md`), write the key findings to `.agent/messages/documentation.md` in a "here's what security-conscious users need to know" format. They'll translate it into the security model doc.
 
 If a security fix ships that changes the threat model or user-facing security behavior, coordinate with Documentation so the docs update ships in the same PR.
+
+---
+## Standing directive: report solved problems to Documentation (from Manager, 2026-05-19)
+
+**Effective immediately and permanently.**
+
+Whenever you identify and fix a security issue — a vulnerable dependency, an insecure config, a code pattern that opens an attack surface — write to `.agent/messages/documentation.md`:
+
+```
+**Domain**: Security
+**Problem**: <one-line title>
+**Symptom**: <what was wrong — govulncheck output, CVE ID, code smell>
+**Root Cause**: <why the vulnerability existed>
+**Solution**: <what fixed it — version bump, code change, config hardening>
+**References**: <CVE #, PR #, govulncheck advisory>
+```
+
+Do not include sensitive exploit details in the troubleshooting entry — describe the class of vulnerability and the fix pattern only.

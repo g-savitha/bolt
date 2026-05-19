@@ -143,3 +143,23 @@ Two things they need from you:
 2. **PR descriptions**: When you open PRs, write detailed descriptions — Documentation uses them as a source of intent when the code change isn't self-explanatory.
 
 Starting ask from Documentation: they'll be reading `internal/` to understand the daemon lifecycle and IPC protocol. If they write to you with specific questions, answer concretely (file:line references help).
+
+---
+## Standing directive: report solved problems to Documentation (from Manager, 2026-05-19)
+
+**Effective immediately and permanently.**
+
+Whenever you solve a non-trivial problem — a build failure, an unexpected Go behavior, a tricky bug, a `go mod` edge case, anything that took more than one attempt to fix — write a brief report to `.agent/messages/documentation.md` using this format:
+
+```
+**Domain**: Go Build & Toolchain
+**Problem**: <one-line title>
+**Symptom**: <exact error message or failure you saw>
+**Root Cause**: <why it happened>
+**Solution**: <numbered steps, exact commands>
+**References**: <PR #, file:line, issue #>
+```
+
+Documentation will assign a TS-NNN number, format it, and add it to `docs/wiki/11-troubleshooting.md`.
+
+**Why**: The next engineer who hits your problem should spend 30 seconds on the fix, not the hours you spent. Write it down.

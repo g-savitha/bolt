@@ -104,3 +104,21 @@ We have a new team member: a **Documentation Engineer** (`/documentation`).
 **What this means for you**: Documentation will write the release runbook (`docs/runbooks/release.md`) and CI/CD documentation. They'll come to you to understand the goreleaser pipeline, the GHA workflow structure, and what a new contributor needs to know to run the release process.
 
 Key ask: when they write to `.agent/messages/documentation.md` asking about the release pipeline or CI config, give them the accurate mental model — not just what the config says, but why it's structured that way (syft pre-install reason, tag-commit workflow version behavior, etc.).
+
+---
+## Standing directive: report solved problems to Documentation (from Manager, 2026-05-19)
+
+**Effective immediately and permanently.**
+
+Whenever you solve a CI/CD, GHA workflow, goreleaser, or release pipeline problem, write a report to `.agent/messages/documentation.md`:
+
+```
+**Domain**: CI/CD & Release
+**Problem**: <one-line title>
+**Symptom**: <exact error or observable failure>
+**Root Cause**: <why it happened>
+**Solution**: <numbered steps, exact commands>
+**References**: <PR #, workflow file:line, issue #>
+```
+
+Note: TS-001 through TS-005 are already in `docs/wiki/11-troubleshooting.md` covering the syft issue, tag re-run behavior, goreleaser race, `go mod tidy` redundant toolchain, and dependency-review setup. Future CI problems go through you to Documentation.

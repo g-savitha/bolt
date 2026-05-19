@@ -68,3 +68,21 @@ We have a new team member: a **Documentation Engineer** (`/documentation`).
 2. **Architecture diagrams**: They'll ask you to describe component relationships in plain language, then turn those descriptions into Mermaid diagrams. If a diagram they produce misrepresents the design, flag it immediately — wrong diagrams are a form of technical debt.
 
 **Standing ask**: Write a brief summary of the daemon/IPC architecture intent to `.agent/messages/documentation.md` when you have a moment. It's the first thing they'll need to write `docs/wiki/02-architecture.md`.
+
+---
+## Standing directive: report solved problems to Documentation (from Manager, 2026-05-19)
+
+**Effective immediately and permanently.**
+
+When you work through a design problem — package layout conflicts, interface design trade-offs, concurrency model decisions that needed revision — and land on a solution, write it to `.agent/messages/documentation.md`:
+
+```
+**Domain**: IPC & Daemon  (or whichever subsystem applies)
+**Problem**: <one-line title>
+**Symptom**: <what made the original design wrong — test failure, import cycle, runtime issue>
+**Root Cause**: <the design gap>
+**Solution**: <the corrected design decision>
+**References**: <ADR #, PR #, file:line>
+```
+
+Architecture-level problems often get captured in ADRs, but the troubleshooting entry captures the *journey* — what was tried first and why it failed — which ADRs often omit.

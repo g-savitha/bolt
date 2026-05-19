@@ -61,3 +61,18 @@ Eight specialist sessions completed today: 27 stories queued (20 Ready-for-Dev /
 - **`pion/ice` ↔ `quic-go` `Transport` plumbing is the Phase-5 nightmare item** (N-§7). No prototype exists; budget a 3-5 day spike at Phase 5 kickoff and price it in now.
 - **Wire schema churn mid-Phase-2.** If D1/D2/D10 aren't locked before any sender/receiver code is written, golden round-trip tests will catch drift late and force rewrites.
 - **CI gap on `macos-latest`** — Phase-2 receiver's concurrent `WriteAt`/`Truncate` semantics differ between APFS and ext4; the live CI cannot catch APFS-specific bugs. BOLT-015 closes it.
+
+---
+## Update — 2026-05-19 (Documentation + Troubleshooting Protocol)
+
+**New hire**: Documentation Engineer (`/documentation`) is live and onboarding.
+
+**New protocol (Savvy directive)**: Every agent has a standing directive to report solved problems to Documentation. Documentation maintains `docs/wiki/11-troubleshooting.md` — a domain-indexed living troubleshooting guide. Scrum enforces this at sprint close.
+
+**Troubleshooting guide seeded**: TS-001 through TS-006 cover:
+- CI/CD: syft missing, tag re-run limitation, goreleaser/gh race, `go mod tidy` toolchain, dependency-review setup
+- QA: `gh` CLI 401 / stale keyring token
+
+**`docs/` directory created**: `docs/wiki/`, `docs/adr/`, `docs/runbooks/` scaffolded. `11-troubleshooting.md` is the first live page.
+
+**All 13 agents notified** with domain-specific troubleshooting intake format and instructions.

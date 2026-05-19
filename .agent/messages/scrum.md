@@ -52,3 +52,14 @@ We have a new team member: a **Documentation Engineer** (`/documentation`).
 **What this means for sprint coordination**: Docs are part of the definition of done. When a BOLT story is marked complete, check whether Documentation has been notified — if a feature shipped without docs, the story isn't fully done.
 
 Add Documentation to the coordination loop for any BOLT story that introduces user-facing behavior, a new config field, a new CLI command, or a significant architectural component. Write to `.agent/messages/documentation.md` whenever a story closes that they need to cover.
+
+---
+## Standing directive: troubleshooting protocol enforcement (from Manager, 2026-05-19)
+
+**Effective immediately and permanently.**
+
+Every agent now has a standing directive to report solved problems to Documentation for the troubleshooting guide (`docs/wiki/11-troubleshooting.md`).
+
+**Your role in enforcement**: When you run sprint coordination and an agent reports resolving a blocker, check whether they wrote it to `.agent/messages/documentation.md`. If not, add it to their action items for the sprint. A solved problem that isn't documented is a problem that will be solved again.
+
+Also: when you mark a BOLT story "Done" in `.agent/backlog/tasks.md`, confirm with Documentation that any gotchas encountered during implementation were captured.
