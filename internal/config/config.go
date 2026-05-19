@@ -10,6 +10,7 @@ package config
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 
@@ -176,18 +177,10 @@ func newWithDefaults() (*Config, error) {
 }
 
 func write(path string, cfg *Config) error {
-	if err := os.MkdirAll(filepath.Dir(path), 0700); err != nil {
-		return fmt.Errorf("create config directory: %w", err)
-	}
-
-	f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644) //nolint:gosec // G304: path is derived from DefaultConfigDir(), not user input
-	if err != nil {
-		return fmt.Errorf("open config file for writing: %w", err)
-	}
-	defer f.Close()
-
-	if err := toml.NewEncoder(f).Encode(cfg); err != nil {
-		return fmt.Errorf("encode config to toml: %w", err)
-	}
-	return nil
+	return writeAtomic(path, func(w io.Writer) error {
+		if err := toml.NewEncoder(w).Encode(cfg); err != nil {
+			return fmt.Errorf("encode config to toml: %w", err)
+		}
+		return nil
+	})
 }
